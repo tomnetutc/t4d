@@ -141,10 +141,6 @@ const ClusterPage: React.FC = () => {
           >
             <div className="cluster-section-header">
               <h2 className="cluster-title">{c.name}</h2>
-              <p className="cluster-meta">
-                n = {filteredData.length.toLocaleString()} respondents
-                &nbsp;·&nbsp; Scale: 1 = Strongly Disagree … 5 = Strongly Agree
-              </p>
             </div>
             <StackedLikertChart
               variables={c.chartVars}

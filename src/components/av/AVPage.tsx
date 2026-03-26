@@ -178,13 +178,10 @@ const AVPage: React.FC = () => {
     <div data-cluster-id={id} ref={setRef(id)} className="cluster-section">
       <div className="cluster-section-header">
         <h2 className="cluster-title">{title}</h2>
-        {meta && <p className="cluster-meta">{meta}</p>}
       </div>
       {children}
     </div>
   );
-
-  const metaText = `n = ${chartData.n.toLocaleString()} respondents`;
 
   return (
     <>
@@ -201,7 +198,7 @@ const AVPage: React.FC = () => {
         {!loading && !error && (
           <>
             {/* E1: Familiarity */}
-            <Section id="familiarity" title="AV Familiarity" meta={metaText}>
+            <Section id="familiarity" title="AV Familiarity">
               <HorizontalBarChart
                 items={chartData.familiarity}
                 title="AV Familiarity"
@@ -211,7 +208,7 @@ const AVPage: React.FC = () => {
             </Section>
 
             {/* E5 + E6: Purchase & WTP */}
-            <Section id="purchase-wtp" title="AV Purchase & Willingness to Pay" meta={metaText}>
+            <Section id="purchase-wtp" title="AV Purchase & Willingness to Pay">
               <div className="av-subchart">
                 <h3 className="av-subchart-title">AV Purchase Intentions</h3>
                 <HorizontalBarChart
@@ -233,7 +230,7 @@ const AVPage: React.FC = () => {
             </Section>
 
             {/* E2: General AV Attitudes */}
-            <Section id="attitudes" title="General Attitudes Toward AVs" meta={metaText}>
+            <Section id="attitudes" title="General Attitudes Toward AVs">
               <StackedLikertChart
                 variables={chartData.avAtt}
                 title="General Attitudes Toward AVs"
@@ -243,7 +240,7 @@ const AVPage: React.FC = () => {
             </Section>
 
             {/* E10: Safety & Policy */}
-            <Section id="safety-policy" title="AV Policy" meta={metaText}>
+            <Section id="safety-policy" title="AV Policy">
               <StackedLikertChart
                 variables={chartData.avPolicy}
                 title="AV Policy"
@@ -253,7 +250,7 @@ const AVPage: React.FC = () => {
             </Section>
 
             {/* E7: AV Ridehailing Attitudes */}
-            <Section id="ridehailing-attitudes" title="AV Ridehailing Attitudes" meta={metaText}>
+            <Section id="ridehailing-attitudes" title="AV Ridehailing Attitudes">
               <StackedLikertChart
                 variables={chartData.avRh}
                 title="AV Ridehailing Attitudes"
@@ -263,7 +260,7 @@ const AVPage: React.FC = () => {
             </Section>
 
             {/* E8: Vehicle Ownership */}
-            <Section id="vehicle-ownership" title="Change in Vehicle Ownership" meta={metaText}>
+            <Section id="vehicle-ownership" title="Change in Vehicle Ownership">
               <p style={{ fontSize: 13, color: '#888', margin: '0 0 12px' }}>
                 How might your household's car ownership change when AVs become available?
               </p>
@@ -276,7 +273,7 @@ const AVPage: React.FC = () => {
             </Section>
 
             {/* E9: Mode Choice Impact */}
-            <Section id="mode-choice" title="AV Impact on Mode Choice" meta={metaText}>
+            <Section id="mode-choice" title="AV Impact on Mode Choice">
               <p style={{ fontSize: 13, color: '#888', margin: '0 0 12px' }}>
                 If you had access to an AV, how would your use of each mode change?
               </p>
@@ -292,7 +289,7 @@ const AVPage: React.FC = () => {
             </Section>
 
             {/* E3: Commute */}
-            <Section id="commute" title="AV & Commute" meta={metaText}>
+            <Section id="commute" title="AV & Commute">
               <p style={{ fontSize: 13, color: '#888', margin: '0 0 12px' }}>
                 How much longer would you be willing to commute if you had access to an AV?
               </p>
@@ -305,7 +302,7 @@ const AVPage: React.FC = () => {
             </Section>
 
             {/* E12: Multitasking */}
-            <Section id="travel-experiences" title="Expected Travel Experiences" meta={metaText}>
+            <Section id="travel-experiences" title="Expected Travel Experiences">
               <p style={{ fontSize: 13, color: '#888', margin: '0 0 12px' }}>
                 What activities would you do during a trip in an AV? (respondents selected up to three)
               </p>
@@ -318,7 +315,7 @@ const AVPage: React.FC = () => {
             </Section>
 
             {/* E4: Lifestyle Changes */}
-            <Section id="lifestyle-changes" title="Anticipated Changes in Lifestyles" meta={metaText}>
+            <Section id="lifestyle-changes" title="Anticipated Changes in Lifestyles">
               <p style={{ fontSize: 13, color: '#888', margin: '0 0 12px' }}>
                 How likely are you to make each of the following changes if you had access to an AV?
               </p>

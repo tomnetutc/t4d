@@ -174,7 +174,6 @@ const MobilityPage: React.FC = () => {
     <div data-cluster-id={id} ref={setRef(id)} className="cluster-section">
       <div className="cluster-section-header">
         <h2 className="cluster-title">{title}</h2>
-        {meta && <p className="cluster-meta">{meta}</p>}
       </div>
       {children}
     </div>
@@ -186,8 +185,6 @@ const MobilityPage: React.FC = () => {
       {children}
     </div>
   );
-
-  const metaText = `n = ${chartData.n.toLocaleString()} respondents`;
 
   return (
     <>
@@ -204,7 +201,7 @@ const MobilityPage: React.FC = () => {
         {!loading && !error && (
           <>
             {/* Familiarity & Adoption */}
-            <Section id="familiarity" title="Familiarity & Adoption" meta={metaText}>
+            <Section id="familiarity" title="Familiarity & Adoption">
               <GenericStackedBarChart
                 variables={chartData.familiarity}
                 categories={FAMILIARITY_CATEGORIES}
@@ -217,7 +214,7 @@ const MobilityPage: React.FC = () => {
             </Section>
 
             {/* Ridehailing: Attitudes */}
-            <Section id="ridehailing-attitudes" title="Attitudes Toward Ridehailing" meta={metaText}>
+            <Section id="ridehailing-attitudes" title="Attitudes Toward Ridehailing">
               <StackedLikertChart
                 variables={chartData.rhAttitudes}
                 title="Attitudes Toward Ridehailing"
@@ -249,7 +246,7 @@ const MobilityPage: React.FC = () => {
             </Section>
 
             {/* Ridehailing: Monthly Expenditures */}
-            <Section id="ridehailing-spending" title="Monthly Expenditures" meta={metaText}>
+            <Section id="ridehailing-spending" title="Monthly Expenditures">
               <HorizontalBarChart
                 items={chartData.rhSpend}
                 title="Monthly Ridehailing Expenditure"
@@ -259,7 +256,7 @@ const MobilityPage: React.FC = () => {
             </Section>
 
             {/* Ridehailing: Impact on Other Modes */}
-            <Section id="ridehailing-impact" title="Impact on Other Modes" meta={metaText}>
+            <Section id="ridehailing-impact" title="Impact on Other Modes">
               <p style={{ fontSize: 13, color: '#888', margin: '0 0 12px' }}>
                 After beginning to use ridehailing, how has your use of each mode changed?
               </p>
@@ -292,7 +289,7 @@ const MobilityPage: React.FC = () => {
             </Section>
 
             {/* Bike/Scooter: Reasons for Using Service */}
-            <Section id="bikescooter-reasons" title="Reasons for Using Service" meta={metaText}>
+            <Section id="bikescooter-reasons" title="Reasons for Using Service">
               <p style={{ fontSize: 13, color: '#888', margin: '0 0 12px' }}>
                 % of bike/scooter users who selected each reason for their last trip (multiple selections allowed).
               </p>
@@ -305,7 +302,7 @@ const MobilityPage: React.FC = () => {
             </Section>
 
             {/* Bike/Scooter: Alternative Mode */}
-            <Section id="bikescooter-alternative" title="Alternative Mode" meta={metaText}>
+            <Section id="bikescooter-alternative" title="Alternative Mode">
               <p style={{ fontSize: 13, color: '#888', margin: '0 0 12px' }}>
                 Without bike/scooter sharing, how would you have made this trip?
               </p>

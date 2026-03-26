@@ -313,7 +313,6 @@ const StackedLikertChart: React.FC<Props> = ({ variables, title, data, showTitle
               })}
             </tbody>
           </table>
-          <div className={styles.scaleNote}>Scale: 1 = Strongly Disagree … 5 = Strongly Agree</div>
         </div>
       )}
     </div>
