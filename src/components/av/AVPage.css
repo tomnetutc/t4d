@@ -1,0 +1,80 @@
+.clusters-page {
+  padding-top: 78px;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-bottom: 32px;
+}
+
+.cluster-section {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 24px 24px 20px;
+  margin-bottom: 20px;
+}
+
+.cluster-section-header {
+  margin-bottom: 16px;
+}
+
+.cluster-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 4px;
+}
+
+.cluster-meta {
+  font-size: 13px;
+  color: #888;
+  margin: 0;
+}
+
+.clusters-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  gap: 16px;
+  font-size: 15px;
+  color: #555;
+}
+
+.clusters-spinner {
+  width: 44px;
+  height: 44px;
+  border: 4px solid #eee;
+  border-top-color: #007bff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.clusters-error {
+  padding: 24px;
+  color: #c0392b;
+}
+
+/* Sub-chart containers for multi-chart sections */
+.av-subchart {
+  background: #fafafa;
+  border: 1px solid #efefef;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.av-subchart:last-child {
+  margin-bottom: 0;
+}
+
+.av-subchart-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #444;
+  margin: 0 0 10px;
+}

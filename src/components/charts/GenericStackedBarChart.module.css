@@ -1,0 +1,11 @@
+.chartContainer { width: 100%; padding: 15px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); background: white; position: relative; }
+.titleRow { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.chartTitle { font-size: 16px; font-weight: 700; color: #333; margin: 0; }
+.tooltip { position: absolute; background: rgba(255,255,255,0.95); border: 1px solid #ddd; border-radius: 6px; padding: 8px 12px; font-size: 13px; pointer-events: none; box-shadow: 0 3px 14px rgba(0,0,0,0.15); opacity: 0; z-index: 9999; min-width: 100px; transition: opacity 0.1s; }
+.respondentCount { font-size: 12px; color: #888; margin-top: 6px; }
+.statsToggle { margin-top: 12px; background: white; color: #333; border: 1px solid #ced4da; border-radius: 4px; padding: 5px 14px; font-size: 13px; font-weight: 500; cursor: pointer; }
+.statsToggle:hover { background: #f0f0f0; }
+.summaryTableWrap { overflow-x: auto; margin-top: 12px; }
+.summaryTable { width: 100%; border-collapse: collapse; font-size: 13px; }
+.summaryTable th { background: #f5f5f5; padding: 8px 12px; text-align: left; font-weight: 600; border-bottom: 2px solid #ddd; color: #333; }
+.summaryTable td { padding: 7px 12px; border-bottom: 1px solid #eee; color: #444; }
