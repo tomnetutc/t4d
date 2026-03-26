@@ -115,10 +115,11 @@ export function computeSelectionRate(
 
 /* CSV export helpers */
 export function buildCsvRows(variables: { shortLabel: string; counts: LikertCounts }[]): string {
-  const header = 'Question,Strongly Disagree,Somewhat Disagree,Neutral,Somewhat Agree,Strongly Agree,Total';
+  const header = 'Question,Strongly Disagree,SD %,Somewhat Disagree,SoD %,Neutral,N %,Somewhat Agree,SA %,Strongly Agree,StA %,Total';
   const rows = variables.map(v => {
     const { stronglyDisagree: sd, somewhatDisagree: d, neutral: n, somewhatAgree: a, stronglyAgree: sa, total } = v.counts;
-    return `"${v.shortLabel}",${sd},${d},${n},${a},${sa},${total}`;
+    const pct = (x: number) => total > 0 ? `${(x / total * 100).toFixed(1)}%` : '0%';
+    return `"${v.shortLabel}",${sd},${pct(sd)},${d},${pct(d)},${n},${pct(n)},${a},${pct(a)},${sa},${pct(sa)},${total}`;
   });
   return [header, ...rows].join('\n');
 }

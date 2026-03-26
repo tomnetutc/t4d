@@ -141,7 +141,7 @@ const HorizontalBarChart: React.FC<Props> = ({
   const handleDownload = () => {
     const header = 'Label,Count,Total,Percentage';
     const rows = items.map(it =>
-      `"${it.fullLabel || it.label}",${it.count},${it.total},${it.total > 0 ? ((it.count / it.total) * 100).toFixed(1) : '0'}`
+      `"${it.fullLabel || it.label}",${it.count},${it.total},${it.total > 0 ? ((it.count / it.total) * 100).toFixed(1) : '0'}%`
     );
     downloadCsv([header, ...rows].join('\n'), `${title.replace(/[^a-z0-9]/gi, '_')}.csv`);
   };

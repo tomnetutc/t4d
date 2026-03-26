@@ -17,6 +17,13 @@
 .navbar-brand-section {
   display: flex;
   align-items: center;
+  gap: 10px;
+}
+
+.navbar-logo {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
 }
 
 .navbar-brand-title {

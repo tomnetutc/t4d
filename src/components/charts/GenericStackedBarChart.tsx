@@ -205,10 +205,15 @@ const GenericStackedBarChart: React.FC<Props> = ({
   }, [variables, categories, colors, categoryShortLabels, width]);
 
   const handleDownload = () => {
-    const catHeaders = (categoryShortLabels || categories).join(',');
+    const labels = categoryShortLabels || categories;
+    const catHeaders = labels.flatMap(l => [l, `${l} %`]).join(',');
     const header = `Question,${catHeaders},Total`;
     const rows = variables.map(v => {
-      const vals = categories.map(c => v.counts[c] || 0).join(',');
+      const vals = categories.flatMap(c => {
+        const count = v.counts[c] || 0;
+        const pct = v.total > 0 ? `${(count / v.total * 100).toFixed(1)}%` : '0%';
+        return [count, pct];
+      }).join(',');
       return `"${v.shortLabel}",${vals},${v.total}`;
     });
     downloadCsv([header, ...rows].join('\n'), `${title.replace(/[^a-z0-9]/gi, '_')}.csv`);

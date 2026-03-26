@@ -236,11 +236,11 @@ const MobilityPage: React.FC = () => {
                   <HorizontalBarChart items={chartData.rhPurp} title="Trip Purpose" showTitle={false} color="#3580b8" />
                 </SubChart>
                 <SubChart title="Travel Companions">
-                  <HorizontalBarChart items={chartData.rhCompanion} title="Travel Companions" showTitle={false} color="#5b9fbf"
+                  <HorizontalBarChart items={chartData.rhCompanion} title="Travel Companions" showTitle={false} color="#3580b8"
                     note="% of ridehailing users who traveled in each way (respondents could select multiple)" />
                 </SubChart>
                 <SubChart title="Alternative Mode (Without Ridehailing)">
-                  <HorizontalBarChart items={chartData.rhAltern} title="Alternative Mode" showTitle={false} color="#2d7fa8" />
+                  <HorizontalBarChart items={chartData.rhAltern} title="Alternative Mode" showTitle={false} color="#3580b8" />
                 </SubChart>
               </div>
             </Section>
@@ -310,7 +310,7 @@ const MobilityPage: React.FC = () => {
                 items={chartData.besAltern}
                 title="Alternative Mode"
                 showTitle={false}
-                color="#93c4b9"
+                color="#2ba88c"
               />
             </Section>
           </>

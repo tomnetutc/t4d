@@ -80,6 +80,8 @@
   border: 1px solid #efefef;
   border-radius: 6px;
   padding: 16px;
+  display: flex;
+  flex-direction: column;
 }
 
 .mob-subchart-title {
