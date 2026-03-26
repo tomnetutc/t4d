@@ -1,0 +1,9 @@
+{
+  "short_name": "T4 Dashboard",
+  "name": "T4 Survey Dashboard",
+  "icons": [],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff"
+}
