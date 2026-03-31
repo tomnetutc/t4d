@@ -227,20 +227,20 @@ const MobilityPage: React.FC = () => {
             <Section id="ridehailing-usage" title="Usage Context (Trip Details)">
               <div className="mob-grid">
                 <SubChart title="Service Type">
-                  <HorizontalBarChart items={chartData.rhService} title="Service Type" showTitle={false} color="#3580b8" />
+                  <HorizontalBarChart items={chartData.rhService} title="Service Type" showTitle={false} color="#507DBC" />
                 </SubChart>
                 <SubChart title="Time of Trip">
-                  <HorizontalBarChart items={chartData.rhTime} title="Time of Trip" showTitle={false} color="#3580b8" />
+                  <HorizontalBarChart items={chartData.rhTime} title="Time of Trip" showTitle={false} color="#507DBC" />
                 </SubChart>
                 <SubChart title="Trip Purpose">
-                  <HorizontalBarChart items={chartData.rhPurp} title="Trip Purpose" showTitle={false} color="#3580b8" />
+                  <HorizontalBarChart items={chartData.rhPurp} title="Trip Purpose" showTitle={false} color="#507DBC" />
                 </SubChart>
                 <SubChart title="Travel Companions">
-                  <HorizontalBarChart items={chartData.rhCompanion} title="Travel Companions" showTitle={false} color="#3580b8"
+                  <HorizontalBarChart items={chartData.rhCompanion} title="Travel Companions" showTitle={false} color="#507DBC"
                     note="% of ridehailing users who traveled in each way (respondents could select multiple)" />
                 </SubChart>
                 <SubChart title="Alternative Mode (Without Ridehailing)">
-                  <HorizontalBarChart items={chartData.rhAltern} title="Alternative Mode" showTitle={false} color="#3580b8" />
+                  <HorizontalBarChart items={chartData.rhAltern} title="Alternative Mode" showTitle={false} color="#507DBC" />
                 </SubChart>
               </div>
             </Section>

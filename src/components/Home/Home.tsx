@@ -106,7 +106,7 @@ const Home: React.FC = () => {
               borderRight: i < STATS.length - 1 ? '1px solid #e0e0e0' : 'none',
               textAlign: 'center',
             }}>
-              <div style={{ fontSize: 24, fontWeight: 700, color: '#3580b8' }}>{s.value}</div>
+              <div style={{ fontSize: 24, fontWeight: 700, color: '#507DBC' }}>{s.value}</div>
               <div style={{ fontSize: 11.5, color: '#777', marginTop: 3, textTransform: 'uppercase', letterSpacing: '0.03em' }}>{s.label}</div>
             </div>
           ))}

@@ -221,7 +221,7 @@ const AVPage: React.FC = () => {
                 items={chartData.familiarity}
                 title="AV Familiarity"
                 showTitle={false}
-                color="#3580b8"
+                color="#507DBC"
               />
             </Section>
 
@@ -233,7 +233,7 @@ const AVPage: React.FC = () => {
                   items={chartData.timePurchase}
                   title="AV Purchase Intentions"
                   showTitle={false}
-                  color="#3580b8"
+                  color="#507DBC"
                 />
               </div>
               <div className="av-subchart">
@@ -242,7 +242,7 @@ const AVPage: React.FC = () => {
                   items={chartData.willPay}
                   title="Willingness to Pay"
                   showTitle={false}
-                  color="#3580b8"
+                  color="#507DBC"
                 />
               </div>
             </Section>

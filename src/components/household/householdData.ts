@@ -95,7 +95,7 @@ export const ADAS_VARIABLES: VarDef[] = [
 export const HOUSUNIT_SLICES = [
   { value: 'Stand-alone home',       label: 'Stand-alone home',    color: '#2d7fa8' },
   { value: 'Attached home/townhome', label: 'Townhome/attached',   color: '#5b9fbf' },
-  { value: 'Condo/apartment',        label: 'Condo/apartment',     color: '#3580b8' },
+  { value: 'Condo/apartment',        label: 'Condo/apartment',     color: '#507DBC' },
   { value: 'Mobile home',            label: 'Mobile home',         color: '#ead97c' },
   { value: 'Other',                  label: 'Other',               color: '#c5c5c5' },
 ];

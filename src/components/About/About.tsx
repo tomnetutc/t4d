@@ -1,7 +1,7 @@
 import React from 'react';
 
 const SectionHeading: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <h2 style={{ fontSize: 18, fontWeight: 600, color: '#3580b8', marginBottom: 10, marginTop: 36, borderBottom: '2px solid #e8f0fc', paddingBottom: 6 }}>
+  <h2 style={{ fontSize: 18, fontWeight: 600, color: '#507DBC', marginBottom: 10, marginTop: 36, borderBottom: '2px solid #e8f0fc', paddingBottom: 6 }}>
     {children}
   </h2>
 );
@@ -86,7 +86,7 @@ const About: React.FC = () => (
       ].map(p => (
         <div key={p.name} style={{ background: '#fafafa', border: '1px solid #e8e8e8', borderRadius: 8, padding: '14px 16px' }}>
           <div style={{ fontSize: 14, fontWeight: 600, color: '#1a1a2e' }}>{p.name}</div>
-          <div style={{ fontSize: 12.5, color: '#3580b8', marginTop: 2 }}>{p.role}</div>
+          <div style={{ fontSize: 12.5, color: '#507DBC', marginTop: 2 }}>{p.role}</div>
           <div style={{ fontSize: 12, color: '#888', marginTop: 2, fontStyle: 'italic' }}>{p.affil}</div>
         </div>
       ))}
@@ -102,7 +102,7 @@ const About: React.FC = () => (
       'Capasso da Silva, D., Batur, I., Khoeini, S., and Pendyala, R.M. (2020). Travel Behavior and Attitudes toward Autonomous Vehicles in Four U.S. Metropolitan Areas. Transportation Research Record.',
       'Batur, I., Khoeini, S., Capasso da Silva, D., and Pendyala, R.M. (2021). Understanding Attitudes toward Autonomous Vehicles across Four U.S. Cities. Transportation Research Part A.',
     ].map((ref, i) => (
-      <div key={i} style={{ fontSize: 13, color: '#444', lineHeight: 1.65, padding: '10px 14px', borderLeft: '3px solid #3580b8', marginBottom: 10, background: '#f9fbff' }}>
+      <div key={i} style={{ fontSize: 13, color: '#444', lineHeight: 1.65, padding: '10px 14px', borderLeft: '3px solid #507DBC', marginBottom: 10, background: '#f9fbff' }}>
         {ref}
       </div>
     ))}

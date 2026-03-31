@@ -203,6 +203,6 @@ export const LD_BIZ_VARS: VarDef[] = [
 ];
 
 export const LD_SERIES = [
-  { label: 'Leisure', color: '#3580b8' },
+  { label: 'Leisure', color: '#507DBC' },
   { label: 'Business', color: '#e87d2e' },
 ];

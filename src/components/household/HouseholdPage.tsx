@@ -326,7 +326,7 @@ const HouseholdPage: React.FC = () => {
                   items={chartData.hhVeh}
                   title="Household Vehicles"
                   showTitle={false}
-                  color="#3580b8"
+                  color="#507DBC"
                 />
               </div>
 
@@ -339,7 +339,7 @@ const HouseholdPage: React.FC = () => {
                   items={chartData.hhDrivers}
                   title="Household Drivers"
                   showTitle={false}
-                  color="#3580b8"
+                  color="#507DBC"
                 />
               </div>
 
@@ -364,7 +364,7 @@ const HouseholdPage: React.FC = () => {
                   items={chartData.vehMiles}
                   title="Vehicle 1 Annual Miles"
                   showTitle={false}
-                  color="#3580b8"
+                  color="#507DBC"
                 />
               </div>
 
@@ -374,7 +374,7 @@ const HouseholdPage: React.FC = () => {
                   items={chartData.vehModYr}
                   title="Vehicle 1 Model Year"
                   showTitle={false}
-                  color="#3580b8"
+                  color="#507DBC"
                 />
               </div>
 
@@ -387,7 +387,7 @@ const HouseholdPage: React.FC = () => {
                   items={chartData.vehMakes}
                   title="Top Vehicle Makes"
                   showTitle={false}
-                  color="#3580b8"
+                  color="#507DBC"
                 />
               </div>
 
@@ -427,7 +427,7 @@ const HouseholdPage: React.FC = () => {
                   items={chartData.tenure}
                   title="Tenure"
                   showTitle={false}
-                  color="#3580b8"
+                  color="#507DBC"
                 />
               </div>
 
@@ -437,7 +437,7 @@ const HouseholdPage: React.FC = () => {
                   items={chartData.yrMoved}
                   title="Year Moved"
                   showTitle={false}
-                  color="#3580b8"
+                  color="#507DBC"
                 />
               </div>
 

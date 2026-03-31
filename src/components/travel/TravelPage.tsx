@@ -230,7 +230,7 @@ const TravelPage: React.FC = () => {
 
     // [12] Airport visits (pie)
     const airportVisit: PieSlice[] = buildPieSlices(filteredData, 'airportvisit', [
-      { value: 'Yes', label: 'Yes', color: '#3580b8' },
+      { value: 'Yes', label: 'Yes', color: '#507DBC' },
       { value: 'No',  label: 'No',  color: '#c5c5c5' },
     ]);
 
@@ -275,7 +275,7 @@ const TravelPage: React.FC = () => {
                   items={chartData.employment}
                   title="Employment / Student Status"
                   showTitle={false}
-                  color="#3580b8"
+                  color="#507DBC"
                 />
               </div>
 
@@ -303,7 +303,7 @@ const TravelPage: React.FC = () => {
                   items={chartData.comDistance}
                   title="Commute Distance"
                   showTitle={false}
-                  color="#3580b8"
+                  color="#507DBC"
                 />
               </div>
 
@@ -314,7 +314,7 @@ const TravelPage: React.FC = () => {
                   items={chartData.comTime}
                   title="One-Way Commute Time"
                   showTitle={false}
-                  color="#3580b8"
+                  color="#507DBC"
                 />
               </div>
 
@@ -396,7 +396,7 @@ const TravelPage: React.FC = () => {
                   items={chartData.milesDriven}
                   title="Average Miles Driven per Week"
                   showTitle={false}
-                  color="#3580b8"
+                  color="#507DBC"
                 />
               </div>
 

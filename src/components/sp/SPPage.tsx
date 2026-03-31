@@ -171,7 +171,7 @@ const SPPage: React.FC = () => {
                     items={scen.items}
                     title={scen.label}
                     showTitle={false}
-                    color="#3580b8"
+                    color="#507DBC"
                   />
                 </div>
               ))}

@@ -25,7 +25,7 @@ import './DemographicsPage.css';
 
 const TOP_MENU_H = 65;
 const SKIP_SET = new Set(['Seen but not answered', 'Appropriate skip', 'Missing (other)']);
-const PIE_PALETTE = ['#3580b8', '#2ba88c', '#e87d2e', '#ead97c', '#c5c5c5', '#e25b61'];
+const PIE_PALETTE = ['#507DBC', '#2ba88c', '#e87d2e', '#ead97c', '#c5c5c5', '#e25b61'];
 
 /* ── helpers ─────────────────────────────────────────────── */
 
@@ -293,7 +293,7 @@ const DemographicsPage: React.FC = () => {
                   items={chartData.gender}
                   title="Gender"
                   showTitle={false}
-                  color="#3580b8"
+                  color="#507DBC"
                 />
               </div>
 
@@ -303,7 +303,7 @@ const DemographicsPage: React.FC = () => {
                   items={chartData.ageGroup}
                   title="Age Group"
                   showTitle={false}
-                  color="#3580b8"
+                  color="#507DBC"
                 />
               </div>
 
@@ -316,7 +316,7 @@ const DemographicsPage: React.FC = () => {
                   items={chartData.race}
                   title="Race"
                   showTitle={false}
-                  color="#3580b8"
+                  color="#507DBC"
                 />
               </div>
 
@@ -344,7 +344,7 @@ const DemographicsPage: React.FC = () => {
                   items={chartData.education}
                   title="Education Level"
                   showTitle={false}
-                  color="#3580b8"
+                  color="#507DBC"
                 />
               </div>
 
@@ -362,7 +362,7 @@ const DemographicsPage: React.FC = () => {
                   items={chartData.hhSize}
                   title="Household Size"
                   showTitle={false}
-                  color="#3580b8"
+                  color="#507DBC"
                 />
               </div>
 
@@ -380,7 +380,7 @@ const DemographicsPage: React.FC = () => {
                   items={chartData.income}
                   title="Household Income"
                   showTitle={false}
-                  color="#3580b8"
+                  color="#507DBC"
                 />
               </div>
 
@@ -399,7 +399,7 @@ const DemographicsPage: React.FC = () => {
                   items={chartData.tenure}
                   title="Tenure"
                   showTitle={false}
-                  color="#3580b8"
+                  color="#507DBC"
                 />
               </div>
 
@@ -414,7 +414,7 @@ const DemographicsPage: React.FC = () => {
                   items={chartData.institution}
                   title="Survey Institution"
                   showTitle={false}
-                  color="#3580b8"
+                  color="#507DBC"
                 />
               </div>
 
@@ -424,7 +424,7 @@ const DemographicsPage: React.FC = () => {
                   items={chartData.state}
                   title="Home State"
                   showTitle={false}
-                  color="#3580b8"
+                  color="#507DBC"
                 />
               </div>
 
