@@ -18,13 +18,14 @@ interface Props {
   color?: string;
   includeDownload?: boolean;
   note?: string;
+  respondentCount?: number; // override footer when items have mixed denominators
 }
 
 const DEFAULT_COLOR = '#2d7fa8';
 
 const HorizontalBarChart: React.FC<Props> = ({
   items, title, showTitle = true, color = DEFAULT_COLOR,
-  includeDownload = true, note,
+  includeDownload = true, note, respondentCount,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -146,7 +147,7 @@ const HorizontalBarChart: React.FC<Props> = ({
     downloadCsv([header, ...rows].join('\n'), `${title.replace(/[^a-z0-9]/gi, '_')}.csv`);
   };
 
-  const respondents = items[0]?.total ?? 0;
+  const respondents = respondentCount ?? (items[0]?.total ?? 0);
 
   return (
     <div className={styles.chartContainer} ref={containerRef}>

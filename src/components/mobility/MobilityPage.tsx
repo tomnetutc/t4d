@@ -145,7 +145,7 @@ const MobilityPage: React.FC = () => {
     const spendDist = computeDistribution(filteredData, 'rh_monthexpend');
     const spendTotal = spendDist.reduce((a, b) => a + b.count, 0);
     const rhSpend: BarItem[] = RH_MONTHEXPEND_CATS
-      .map(cat => ({ label: cat, count: spendDist.find(d => d.label === cat)?.count ?? 0, total: spendTotal }))
+      .map(cat => ({ label: cat.trim(), count: spendDist.find(d => d.label === cat)?.count ?? 0, total: spendTotal }))
       .filter(it => it.count > 0);
 
     // 5. Impact on modes

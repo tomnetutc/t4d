@@ -1,6 +1,10 @@
 import React from 'react';
 import Select, { StylesConfig, GroupBase } from 'react-select';
-import { useFilters, ActiveFilter, ALL_METROS, ALL_GENDERS, ALL_AGE_GROUPS, METRO_LABELS } from '../../context/FilterContext';
+import {
+  useFilters, ActiveFilter,
+  ALL_METROS, ALL_GENDERS, ALL_AGE_GROUPS, ALL_EMPLOYMENT, ALL_INCOMES,
+  METRO_LABELS, EMPLOYMENT_SHORT,
+} from '../../context/FilterContext';
 import './TopMenu.css';
 
 interface Option { value: string; label: string; }
@@ -19,6 +23,16 @@ const genderOptions: GroupedOption[] = [{
 const ageOptions: GroupedOption[] = [{
   label: 'Age Group',
   options: ALL_AGE_GROUPS.map(a => ({ value: a, label: a })),
+}];
+
+const employmentOptions: GroupedOption[] = [{
+  label: 'Employment',
+  options: ALL_EMPLOYMENT.map(e => ({ value: e, label: EMPLOYMENT_SHORT[e] ?? e })),
+}];
+
+const incomeOptions: GroupedOption[] = [{
+  label: 'Income',
+  options: ALL_INCOMES.map(i => ({ value: i, label: i })),
 }];
 
 const customStyles: StylesConfig<Option, false, GroupedOption> = {
@@ -53,19 +67,18 @@ const TopMenu: React.FC = () => {
     const f = filters.find(x => x.field === field);
     if (!f) return null;
     if (field === 'metro') return { value: f.value, label: METRO_LABELS[f.value] ?? f.value };
+    if (field === 'employment') return { value: f.value, label: EMPLOYMENT_SHORT[f.value] ?? f.value };
     return { value: f.value, label: f.value };
   };
 
   const allSelected = filters.length === 0;
-
-  const handleAll = () => clearFilters();
 
   return (
     <div className="menu-container">
       <span className="segment-label">Select Segment:</span>
 
       <label className="all-checkbox">
-        <input type="checkbox" checked={allSelected} onChange={handleAll} readOnly={false} />
+        <input type="checkbox" checked={allSelected} onChange={clearFilters} readOnly={false} />
         <span>All</span>
       </label>
 
@@ -96,6 +109,26 @@ const TopMenu: React.FC = () => {
           onChange={opt => opt ? addFilter({ field: 'age', value: opt.value }) : removeFilter('age', getVal('age')?.value ?? '')}
           isClearable
           placeholder="Age Group"
+          styles={customStyles}
+          menuPortalTarget={document.body}
+          className="filter-select"
+        />
+        <Select<Option, false, GroupedOption>
+          options={employmentOptions}
+          value={getVal('employment')}
+          onChange={opt => opt ? addFilter({ field: 'employment', value: opt.value }) : removeFilter('employment', getVal('employment')?.value ?? '')}
+          isClearable
+          placeholder="Employment"
+          styles={customStyles}
+          menuPortalTarget={document.body}
+          className="filter-select"
+        />
+        <Select<Option, false, GroupedOption>
+          options={incomeOptions}
+          value={getVal('income')}
+          onChange={opt => opt ? addFilter({ field: 'income', value: opt.value }) : removeFilter('income', getVal('income')?.value ?? '')}
+          isClearable
+          placeholder="Income"
           styles={customStyles}
           menuPortalTarget={document.body}
           className="filter-select"

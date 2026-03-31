@@ -48,9 +48,14 @@ function toOrderedItems(
 function toBinaryItems(
   data: SurveyRow[], vars: { key: string; shortLabel: string; selectedValue?: string }[]
 ): BarItem[] {
+  // Use computeSelectionRate to match the exact option text (correctly excludes "0" placeholders
+  // that Qualtrics writes for not-selected options in some columns).
+  // data.length as the consistent denominator gives % of all respondents who chose each option,
+  // and keeps the respondent count footer accurate across all items.
+  const total = data.length;
   return vars
     .map(v => {
-      const { selected, total } = computeSelectionRate(data, v.key, v.selectedValue!);
+      const { selected } = computeSelectionRate(data, v.key, v.selectedValue!);
       return { label: v.shortLabel, count: selected, total };
     })
     .sort((a, b) => b.count - a.count);
@@ -161,7 +166,20 @@ const AVPage: React.FC = () => {
     const commute: BarItem[] = toOrderedItems(filteredData, 'av_addcomtime', AV_COMMUTE_CATS, AV_COMMUTE_SHORT);
 
     // E12: Multitasking (binary multi-select)
-    const multiTask: BarItem[] = toBinaryItems(filteredData, AV_MULTI_VARIABLES);
+    // av_multi_interpass is only asked of respondents who would ride an AV;
+    // ~2,050 rows have 'Appropriate skip' and must be excluded from its denominator.
+    // All other av_multi variables use data.length as the consistent denominator.
+    const INTERPASS_SKIP = new Set(['Appropriate skip', 'Seen but not answered']);
+    const interpassEligible = filteredData.filter(r => !INTERPASS_SKIP.has(r['av_multi_interpass'])).length;
+    const defaultTotal = filteredData.length;
+    const multiTask: BarItem[] = AV_MULTI_VARIABLES
+      .map(v => {
+        const { selected } = computeSelectionRate(filteredData, v.key, v.selectedValue!);
+        const total = v.key === 'av_multi_interpass' ? interpassEligible : defaultTotal;
+        return { label: v.shortLabel, count: selected, total };
+      })
+      // Sort by percentage so bar length matches visual order even with mixed denominators
+      .sort((a, b) => (b.count / b.total) - (a.count / a.total));
 
     // E4: Lifestyle Changes (likelihood scale)
     const lifestyle: GenericChartVariable[] = AV_LIFESTYLE_VARIABLES.map(v => {
@@ -203,7 +221,7 @@ const AVPage: React.FC = () => {
                 items={chartData.familiarity}
                 title="AV Familiarity"
                 showTitle={false}
-                color="#5b9fbf"
+                color="#3580b8"
               />
             </Section>
 
@@ -305,12 +323,17 @@ const AVPage: React.FC = () => {
             <Section id="travel-experiences" title="Expected Travel Experiences">
               <p style={{ fontSize: 13, color: '#888', margin: '0 0 12px' }}>
                 What activities would you do during a trip in an AV? (respondents selected up to three)
+                <br />
+                <span style={{ fontSize: 12, color: '#aaa' }}>
+                  * "Interact with passengers" % is among respondents who indicated willingness to ride in an AV only.
+                </span>
               </p>
               <HorizontalBarChart
                 items={chartData.multiTask}
                 title="Expected Travel Experiences"
                 showTitle={false}
                 color="#2ba88c"
+                respondentCount={filteredData.length}
               />
             </Section>
 

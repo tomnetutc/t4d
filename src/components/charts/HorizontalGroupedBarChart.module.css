@@ -1,0 +1,33 @@
+.chartContainer { padding: 4px 0 8px; position: relative; display: flex; flex-direction: column; }
+.titleRow { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.chartTitle { font-size: 14px; font-weight: 600; color: #444; margin: 0; }
+
+.legend { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-bottom: 14px; }
+.legendItem { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #555; }
+.legendSwatch { width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0; }
+
+.chartBody { display: flex; flex-direction: column; gap: 14px; }
+
+.group { display: flex; flex-direction: column; gap: 0; }
+.groupHeader {
+  font-size: 13px; font-weight: 700; color: #333;
+  padding: 4px 0 6px;
+  border-bottom: 1px solid #e8e8e8;
+  margin-bottom: 6px;
+}
+
+.barRow { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; min-height: 26px; }
+.seriesLabel { font-size: 12px; color: #666; width: 68px; flex-shrink: 0; text-align: right; }
+.barTrack { flex: 1; background: #f2f2f2; border-radius: 3px; height: 22px; overflow: hidden; position: relative; }
+.bar { height: 100%; border-radius: 3px; width: 0; transition: width 0.75s ease; }
+.barValue { font-size: 12px; color: #555; width: 72px; flex-shrink: 0; }
+
+.respondentCount { font-size: 11px; color: #999; margin-top: 8px; }
+.note { font-size: 11px; color: #aaa; margin-top: 4px; font-style: italic; }
+
+.statsToggle { margin-top: 12px; background: white; color: #333; border: 1px solid #ced4da; border-radius: 4px; padding: 5px 14px; font-size: 13px; font-weight: 500; cursor: pointer; }
+.statsToggle:hover { background: #f0f0f0; }
+.summaryTableWrap { overflow-x: auto; margin-top: 12px; }
+.summaryTable { width: 100%; border-collapse: collapse; font-size: 13px; }
+.summaryTable th { background: #f5f5f5; padding: 8px 12px; text-align: left; font-weight: 600; border-bottom: 2px solid #ddd; color: #333; }
+.summaryTable td { padding: 7px 12px; border-bottom: 1px solid #eee; color: #444; }

@@ -87,7 +87,8 @@ export const RH_TRIPPURP_CATS = [
   'Medical/dental',
   'Other',
 ];
-export const RH_MONTHEXPEND_CATS = ['$0','$1 - $9','$10 - $29','$30 - $49','$50 - $74','$75 - $100'];
+// Note: '$0 ' has a trailing space in the CSV as exported from Qualtrics
+export const RH_MONTHEXPEND_CATS = ['$0 ','$1 - $9','$10 - $29','$30 - $49','$50 - $74','$75 - $100','More than $100'];
 
 // Companions — binary (selectedValue = the "selected" string for each variable)
 export const RH_COMPANION_VARIABLES: VarDef[] = [

@@ -7,21 +7,35 @@ import Sidebar from './components/Sidebar/Sidebar';
 import ClusterPage from './components/attitudes/ClusterPage';
 import MobilityPage from './components/mobility/MobilityPage';
 import AVPage from './components/av/AVPage';
+import SPPage from './components/sp/SPPage';
+import TravelPage from './components/travel/TravelPage';
+import HouseholdPage from './components/household/HouseholdPage';
+import DemographicsPage from './components/demographics/DemographicsPage';
 import Home from './components/Home/Home';
 import About from './components/About/About';
 import './App.css';
 
-// Adds/removes `is-dashboard` on body so overflow-y:hidden applies only on chart pages
+// Adds/removes `is-dashboard` on body so overflow-y:hidden applies only on chart pages.
+// Also resets .main-area scroll to 0 when the top-level section changes (e.g. /av → /travel)
+// so the incoming page's scroll spy doesn't fire with a stale scroll position.
 function BodyClassManager() {
   const loc = useLocation();
+  const topSection = loc.pathname.split('/')[1];
+
   useEffect(() => {
-    if (loc.pathname.startsWith('/attitudes') || loc.pathname.startsWith('/mobility') || loc.pathname.startsWith('/av')) {
+    if (loc.pathname.startsWith('/attitudes') || loc.pathname.startsWith('/mobility') || loc.pathname.startsWith('/av') || loc.pathname.startsWith('/sp') || loc.pathname.startsWith('/travel') || loc.pathname.startsWith('/household') || loc.pathname.startsWith('/demographics')) {
       document.body.classList.add('is-dashboard');
     } else {
       document.body.classList.remove('is-dashboard');
     }
     return () => { document.body.classList.remove('is-dashboard'); };
   }, [loc.pathname]);
+
+  useEffect(() => {
+    const mainArea = document.querySelector('.main-area') as HTMLElement | null;
+    if (mainArea) mainArea.scrollTop = 0;
+  }, [topSection]);
+
   return null;
 }
 
@@ -69,6 +83,22 @@ function AppRoutes() {
         <Route
           path="/av/:section"
           element={<DashboardLayout><AVPage /></DashboardLayout>}
+        />
+        <Route
+          path="/sp/:section"
+          element={<DashboardLayout><SPPage /></DashboardLayout>}
+        />
+        <Route
+          path="/travel/:section"
+          element={<DashboardLayout><TravelPage /></DashboardLayout>}
+        />
+        <Route
+          path="/household/:section"
+          element={<DashboardLayout><HouseholdPage /></DashboardLayout>}
+        />
+        <Route
+          path="/demographics/:section"
+          element={<DashboardLayout><DemographicsPage /></DashboardLayout>}
         />
         <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>
