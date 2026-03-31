@@ -242,7 +242,7 @@ const AVPage: React.FC = () => {
                   items={chartData.willPay}
                   title="Willingness to Pay"
                   showTitle={false}
-                  color="#2d7fa8"
+                  color="#3580b8"
                 />
               </div>
             </Section>

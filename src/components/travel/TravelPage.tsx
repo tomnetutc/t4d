@@ -275,7 +275,7 @@ const TravelPage: React.FC = () => {
                   items={chartData.employment}
                   title="Employment / Student Status"
                   showTitle={false}
-                  color="#2d7fa8"
+                  color="#3580b8"
                 />
               </div>
 
@@ -314,7 +314,7 @@ const TravelPage: React.FC = () => {
                   items={chartData.comTime}
                   title="One-Way Commute Time"
                   showTitle={false}
-                  color="#5b9fbf"
+                  color="#3580b8"
                 />
               </div>
 

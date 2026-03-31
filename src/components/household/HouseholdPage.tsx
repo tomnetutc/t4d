@@ -339,7 +339,7 @@ const HouseholdPage: React.FC = () => {
                   items={chartData.hhDrivers}
                   title="Household Drivers"
                   showTitle={false}
-                  color="#2d7fa8"
+                  color="#3580b8"
                 />
               </div>
 
@@ -374,7 +374,7 @@ const HouseholdPage: React.FC = () => {
                   items={chartData.vehModYr}
                   title="Vehicle 1 Model Year"
                   showTitle={false}
-                  color="#5b9fbf"
+                  color="#3580b8"
                 />
               </div>
 
@@ -387,7 +387,7 @@ const HouseholdPage: React.FC = () => {
                   items={chartData.vehMakes}
                   title="Top Vehicle Makes"
                   showTitle={false}
-                  color="#2d7fa8"
+                  color="#3580b8"
                 />
               </div>
 
@@ -437,7 +437,7 @@ const HouseholdPage: React.FC = () => {
                   items={chartData.yrMoved}
                   title="Year Moved"
                   showTitle={false}
-                  color="#5b9fbf"
+                  color="#3580b8"
                 />
               </div>
 
