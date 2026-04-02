@@ -248,9 +248,9 @@ const DemographicsPage: React.FC = () => {
       '4':  'Arizona', '12': 'Florida', '13': 'Georgia', '48': 'Texas',
     };
     const stateDist = computeDistribution(filteredData, 'HState2');
-    const stateTotal = stateDist.reduce((a, b) => a + b.count, 0);
-    const state: BarItem[] = stateDist
-      .filter(d => FIPS_TO_STATE[d.label]) // drop 'Variable not available...' entries
+    const validStateEntries = stateDist.filter(d => FIPS_TO_STATE[d.label]);
+    const stateTotal = validStateEntries.reduce((a, b) => a + b.count, 0);
+    const state: BarItem[] = validStateEntries
       .map(d => ({ label: FIPS_TO_STATE[d.label], count: d.count, total: stateTotal }))
       .sort((a, b) => b.count - a.count);
 
