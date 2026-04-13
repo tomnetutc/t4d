@@ -141,6 +141,7 @@ const ClusterPage: React.FC = () => {
           >
             <div className="cluster-section-header">
               <h2 className="cluster-title">{c.name}</h2>
+              <p className="cluster-survey-question">To begin, we would like to learn about your attitudes and opinions on transportation and life in general. For each of the following statements, please choose the response that most closely matches your feelings.</p>
             </div>
             <StackedLikertChart
               variables={c.chartVars}

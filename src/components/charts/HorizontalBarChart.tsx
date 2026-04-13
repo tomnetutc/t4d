@@ -82,10 +82,11 @@ const HorizontalBarChart: React.FC<Props> = ({
         const pct = item.total > 0 ? (item.count / item.total) * 100 : 0;
         const y = i * (rowH + rowGap);
 
-        // Label (left)
-        const labelEl = svg.append('text')
-          .attr('x', labelWidth - 8).attr('y', y + rowH / 2 + 4)
-          .attr('text-anchor', 'end').attr('font-size', 12.5).attr('fill', '#444');
+        // Label (left) — placed inside g so offset matches bars exactly
+        const labelEl = g.append('text')
+          .attr('x', -8).attr('y', y + rowH / 2)
+          .attr('text-anchor', 'end').attr('font-size', 12.5).attr('fill', '#444')
+          .attr('dominant-baseline', 'middle');
         // Truncate if too long
         labelEl.text(item.label);
         const labelNode = labelEl.node() as SVGTextElement | null;
@@ -122,8 +123,9 @@ const HorizontalBarChart: React.FC<Props> = ({
 
         // Percentage label (right of bar)
         g.append('text')
-          .attr('x', barAreaWidth + 6).attr('y', y + rowH / 2 + 4)
+          .attr('x', barAreaWidth + 6).attr('y', y + rowH / 2)
           .attr('font-size', 12).attr('fill', '#555')
+          .attr('dominant-baseline', 'middle')
           .style('opacity', 0)
           .text(`${pct.toFixed(1)}%`)
           .transition().duration(400).delay(700 + i * 40).style('opacity', 1);

@@ -16,6 +16,8 @@ import {
   CHANGE_CATEGORIES, CHANGE_COLORS, CHANGE_VARIABLES,
   RH_SERVICETYPE_CATS, RH_TRIPTIME_CATS, RH_TRIPPURP_CATS, RH_MONTHEXPEND_CATS,
   RH_COMPANION_VARIABLES, RH_ALTERNMODE_CATS,
+  RH_WAITTIME_BINS, RH_DURATION_BINS, RH_TRIPCOST_BINS,
+  RH_ADDTIME_CATS, RH_ADDTIME_SHORT,
   BES_SERVICETYPE_CATS, BES_TRIPTIME_CATS, BES_TRIPLENGTH_CATS,
   BES_PURPOSE_CATS, BES_PURPOSE_LABELS, BES_REASONS, BES_ALTERNMODE_CATS,
   MOBILITY_NAV,
@@ -44,6 +46,27 @@ function toOrderedItems(data: SurveyRow[], variable: string, cats: string[], lab
     .filter(it => it.count > 0)
     .sort((a, b) => b.count - a.count);
 }
+const SKIP_SET = new Set(['Seen but not answered', 'Appropriate skip', 'Missing (other)', 'Option not selected']);
+
+function binNumeric(
+  data: SurveyRow[], variable: string,
+  bins: Array<{ label: string; min: number; max: number }>
+): BarItem[] {
+  const counts = new Array(bins.length).fill(0);
+  let total = 0;
+  for (const row of data) {
+    const v = row[variable];
+    if (!v || SKIP_SET.has(v)) continue;
+    const n = parseFloat(v);
+    if (isNaN(n)) continue;
+    total++;
+    for (let i = 0; i < bins.length; i++) {
+      if (n >= bins[i].min && n < bins[i].max) { counts[i]++; break; }
+    }
+  }
+  return bins.map((bin, i) => ({ label: bin.label, count: counts[i], total })).filter(it => it.count > 0);
+}
+
 function toBinaryItems(data: SurveyRow[], vars: { key: string; shortLabel: string; selectedValue?: string }[]): BarItem[] {
   const rates = vars.map(v => computeSelectionRate(data, v.key, v.selectedValue!));
   const total = rates[0]?.total ?? 0;
@@ -137,9 +160,19 @@ const MobilityPage: React.FC = () => {
     const rhServiceTotal = rhServiceDist.reduce((a, b) => a + b.count, 0);
     const rhService: BarItem[] = toOrderedItems(filteredData, 'rh_servicetype', RH_SERVICETYPE_CATS);
     const rhTime: BarItem[] = toOrderedItems(filteredData, 'rh_triptime', RH_TRIPTIME_CATS);
+    const rhWaitTime: BarItem[] = binNumeric(filteredData, 'rh_tripwait', RH_WAITTIME_BINS);
+    const rhDuration: BarItem[] = binNumeric(filteredData, 'rh_tripduration', RH_DURATION_BINS);
+    const rhTripCost: BarItem[] = binNumeric(filteredData, 'rh_tripcost_value', RH_TRIPCOST_BINS);
     const rhPurp: BarItem[] = toOrderedItems(filteredData, 'rh_trippurp', RH_TRIPPURP_CATS);
     const rhCompanion: BarItem[] = toBinaryItems(filteredData, RH_COMPANION_VARIABLES);
     const rhAltern: BarItem[] = toOrderedItems(filteredData, 'rh_alternmode', RH_ALTERNMODE_CATS);
+
+    // 3b. Shared ridehailing additional time tolerance
+    const rhAddTime: BarItem[] = toOrderedItems(filteredData, 'rh_addtimeshare', RH_ADDTIME_CATS, RH_ADDTIME_SHORT)
+      .sort((a, b) => {
+        const order = ['1–5 min','6–10 min','11–15 min','16+ min','Would not use shared'];
+        return order.indexOf(a.label) - order.indexOf(b.label);
+      });
 
     // 4. Monthly Spending
     const spendDist = computeDistribution(filteredData, 'rh_monthexpend');
@@ -166,14 +199,15 @@ const MobilityPage: React.FC = () => {
     // 8. BES Alternative mode
     const besAltern: BarItem[] = toOrderedItems(filteredData, 'bes_alternmode', BES_ALTERNMODE_CATS);
 
-    return { familiarity, rhAttitudes, rhService, rhTime, rhPurp, rhCompanion, rhAltern, rhSpend, rhImpact, besService, besTime, besLength, besPurpose, besReasons, besAltern, n };
+    return { familiarity, rhAttitudes, rhService, rhTime, rhWaitTime, rhDuration, rhTripCost, rhPurp, rhCompanion, rhAltern, rhAddTime, rhSpend, rhImpact, besService, besTime, besLength, besPurpose, besReasons, besAltern, n };
   }, [filteredData]);
 
   /* ── Render ─────────────────────────────────────────────── */
-  const Section = ({ id, title, meta, children }: { id: string; title: string; meta?: string; children: React.ReactNode }) => (
+  const Section = ({ id, title, surveyQuestion, children }: { id: string; title: string; surveyQuestion?: string; children: React.ReactNode }) => (
     <div data-cluster-id={id} ref={setRef(id)} className="cluster-section">
       <div className="cluster-section-header">
         <h2 className="cluster-title">{title}</h2>
+        {surveyQuestion && <p className="cluster-survey-question">{surveyQuestion}</p>}
       </div>
       {children}
     </div>
@@ -201,7 +235,7 @@ const MobilityPage: React.FC = () => {
         {!loading && !error && (
           <>
             {/* Familiarity & Adoption */}
-            <Section id="familiarity" title="Familiarity & Adoption">
+            <Section id="familiarity" title="Familiarity & Adoption" surveyQuestion="How often do you generally use the following transportation services?">
               <GenericStackedBarChart
                 variables={chartData.familiarity}
                 categories={FAMILIARITY_CATEGORIES}
@@ -214,7 +248,7 @@ const MobilityPage: React.FC = () => {
             </Section>
 
             {/* Ridehailing: Attitudes */}
-            <Section id="ridehailing-attitudes" title="Attitudes Toward Ridehailing">
+            <Section id="ridehailing-attitudes" title="Attitudes Toward Ridehailing" surveyQuestion="Please rate your level of agreement with each of the following statements about ridehailing services (e.g., Uber/Lyft).">
               <StackedLikertChart
                 variables={chartData.rhAttitudes}
                 title="Attitudes Toward Ridehailing"
@@ -224,13 +258,22 @@ const MobilityPage: React.FC = () => {
             </Section>
 
             {/* Ridehailing: Usage Context */}
-            <Section id="ridehailing-usage" title="Usage Context (Trip Details)">
+            <Section id="ridehailing-usage" title="Usage Context (Trip Details)" surveyQuestion="Considering the last trip you recall using ridehailing services, please answer the following questions.">
               <div className="mob-grid">
                 <SubChart title="Service Type">
                   <HorizontalBarChart items={chartData.rhService} title="Service Type" showTitle={false} color="#507DBC" />
                 </SubChart>
                 <SubChart title="Time of Trip">
                   <HorizontalBarChart items={chartData.rhTime} title="Time of Trip" showTitle={false} color="#507DBC" />
+                </SubChart>
+                <SubChart title="Wait Time">
+                  <HorizontalBarChart items={chartData.rhWaitTime} title="Wait Time" showTitle={false} color="#507DBC" />
+                </SubChart>
+                <SubChart title="In-Vehicle Travel Time">
+                  <HorizontalBarChart items={chartData.rhDuration} title="In-Vehicle Travel Time" showTitle={false} color="#507DBC" />
+                </SubChart>
+                <SubChart title="Trip Cost">
+                  <HorizontalBarChart items={chartData.rhTripCost} title="Trip Cost" showTitle={false} color="#507DBC" />
                 </SubChart>
                 <SubChart title="Trip Purpose">
                   <HorizontalBarChart items={chartData.rhPurp} title="Trip Purpose" showTitle={false} color="#507DBC" />
@@ -246,7 +289,7 @@ const MobilityPage: React.FC = () => {
             </Section>
 
             {/* Ridehailing: Monthly Expenditures */}
-            <Section id="ridehailing-spending" title="Monthly Expenditures">
+            <Section id="ridehailing-spending" title="Monthly Expenditures" surveyQuestion="In the last month, about how much did you spend on ridehailing (such as Uber/Lyft) services?">
               <HorizontalBarChart
                 items={chartData.rhSpend}
                 title="Monthly Ridehailing Expenditure"
@@ -255,11 +298,18 @@ const MobilityPage: React.FC = () => {
               />
             </Section>
 
+            {/* Ridehailing: Shared Ridehailing Preference */}
+            <Section id="ridehailing-shared" title="Shared Ridehailing Preference" surveyQuestion="Assume that shared ridehailing (e.g., uberPOOL or Lyft Share) was available for this trip, allowing for cheaper fares but longer travel times to reach your destination. What is the maximum additional travel time you would have accepted if you had received a 50% discount?">
+              <HorizontalBarChart
+                items={chartData.rhAddTime}
+                title="Additional Time Tolerance for Shared Ridehailing"
+                showTitle={false}
+                color="#507DBC"
+              />
+            </Section>
+
             {/* Ridehailing: Impact on Other Modes */}
-            <Section id="ridehailing-impact" title="Impact on Other Modes">
-              <p style={{ fontSize: 13, color: '#888', margin: '0 0 12px' }}>
-                After beginning to use ridehailing, how has your use of each mode changed?
-              </p>
+            <Section id="ridehailing-impact" title="Impact on Other Modes" surveyQuestion="After beginning to use ridehailing services, how has your use of each of the following means of transportation changed?">
               <GenericStackedBarChart
                 variables={chartData.rhImpact}
                 categories={CHANGE_CATEGORIES}
@@ -271,7 +321,7 @@ const MobilityPage: React.FC = () => {
             </Section>
 
             {/* Bike/Scooter: Last Trip Details */}
-            <Section id="bikescooter-trips" title="Last Trip Details">
+            <Section id="bikescooter-trips" title="Last Trip Details" surveyQuestion="Considering the last trip you made using bikesharing or e-scooter sharing, please answer the following questions.">
               <div className="mob-grid">
                 <SubChart title="Service Type">
                   <HorizontalBarChart items={chartData.besService} title="Service Type" showTitle={false} color="#2ba88c" />
@@ -289,10 +339,7 @@ const MobilityPage: React.FC = () => {
             </Section>
 
             {/* Bike/Scooter: Reasons for Using Service */}
-            <Section id="bikescooter-reasons" title="Reasons for Using Service">
-              <p style={{ fontSize: 13, color: '#888', margin: '0 0 12px' }}>
-                % of bike/scooter users who selected each reason for their last trip (multiple selections allowed).
-              </p>
+            <Section id="bikescooter-reasons" title="Reasons for Using Service" surveyQuestion="Why did you use this service for the trip?">
               <HorizontalBarChart
                 items={chartData.besReasons}
                 title="Reasons for Using Bike/Scooter Sharing"
@@ -302,10 +349,7 @@ const MobilityPage: React.FC = () => {
             </Section>
 
             {/* Bike/Scooter: Alternative Mode */}
-            <Section id="bikescooter-alternative" title="Alternative Mode">
-              <p style={{ fontSize: 13, color: '#888', margin: '0 0 12px' }}>
-                Without bike/scooter sharing, how would you have made this trip?
-              </p>
+            <Section id="bikescooter-alternative" title="Alternative Mode" surveyQuestion="How would you have made this trip if the shared bikes or e-scooters were not available?">
               <HorizontalBarChart
                 items={chartData.besAltern}
                 title="Alternative Mode"

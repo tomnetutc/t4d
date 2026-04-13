@@ -23,9 +23,11 @@ const Navbar: React.FC = () => {
         </NavLink>
         <NavLink
           to="/attitudes/environmental"
-          className={({ isActive }) =>
-            window.location.hash.includes('/attitudes') ? 'nav-link active' : 'nav-link'
-          }
+          className={({ isActive }) => {
+            const hash = window.location.hash;
+            const explorerPaths = ['/attitudes', '/av', '/mobility', '/travel', '/household', '/demographics', '/sp'];
+            return explorerPaths.some(p => hash.includes(p)) ? 'nav-link active' : 'nav-link';
+          }}
         >
           Survey Explorer
         </NavLink>

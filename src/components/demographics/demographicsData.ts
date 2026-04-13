@@ -38,8 +38,8 @@ export const HH_SIZE_CATS = ['1', '2', '3', '4', '5', '6', '7+'];
 // ── [11] Survey institution — exact values from FilterContext ─
 export const INSTITUTION_CATS = ['ASU', 'GT', 'USF', 'UT'];
 export const INSTITUTION_LABELS: Record<string, string> = {
-  ASU: 'ASU (Phoenix)',
-  GT:  'GT (Atlanta)',
-  USF: 'USF (Tampa)',
-  UT:  'UT (Austin)',
+  ASU: 'Phoenix',
+  GT:  'Atlanta',
+  USF: 'Tampa',
+  UT:  'Austin',
 };

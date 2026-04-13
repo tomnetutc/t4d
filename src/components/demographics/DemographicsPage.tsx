@@ -261,10 +261,11 @@ const DemographicsPage: React.FC = () => {
   }, [filteredData]);
 
   /* ── Render ──────────────────────────────────────────────── */
-  const Section = ({ id, title, children }: { id: string; title: string; children: React.ReactNode }) => (
+  const Section = ({ id, title, surveyQuestion, children }: { id: string; title: string; surveyQuestion?: string; children: React.ReactNode }) => (
     <div data-cluster-id={id} ref={setRef(id)} className="cluster-section">
       <div className="cluster-section-header">
         <h2 className="cluster-title">{title}</h2>
+        {surveyQuestion && <p className="cluster-survey-question">{surveyQuestion}</p>}
       </div>
       {children}
     </div>
@@ -289,6 +290,7 @@ const DemographicsPage: React.FC = () => {
 
               <div className="demo-subchart">
                 <h3 className="demo-subchart-title">Gender</h3>
+                <p className="cluster-survey-question">What is your gender?</p>
                 <HorizontalBarChart
                   items={chartData.gender}
                   title="Gender"
@@ -299,6 +301,7 @@ const DemographicsPage: React.FC = () => {
 
               <div className="demo-subchart">
                 <h3 className="demo-subchart-title">Age Group</h3>
+                <p className="cluster-survey-question">In what year were you born?</p>
                 <HorizontalBarChart
                   items={chartData.ageGroup}
                   title="Age Group"
@@ -309,9 +312,7 @@ const DemographicsPage: React.FC = () => {
 
               <div className="demo-subchart">
                 <h3 className="demo-subchart-title">Race</h3>
-                <p style={{ fontSize: 13, color: '#888', margin: '0 0 10px' }}>
-                  Respondents could select up to two race categories.
-                </p>
+                <p className="cluster-survey-question">Which of the following categories do you identify with? Please check no more than two categories.</p>
                 <HorizontalBarChart
                   items={chartData.race}
                   title="Race"
@@ -322,6 +323,7 @@ const DemographicsPage: React.FC = () => {
 
               <div className="demo-subchart">
                 <h3 className="demo-subchart-title">Ethnicity (Hispanic or Latino)</h3>
+                <p className="cluster-survey-question">Are you Hispanic or Latino?</p>
                 <PieChart
                   slices={chartData.hispanic}
                   title="Ethnicity"
@@ -331,6 +333,7 @@ const DemographicsPage: React.FC = () => {
 
               <div className="demo-subchart">
                 <h3 className="demo-subchart-title">Place of Birth</h3>
+                <p className="cluster-survey-question">Where were you born?</p>
                 <PieChart
                   slices={chartData.placebirth}
                   title="Place of Birth"
@@ -340,6 +343,7 @@ const DemographicsPage: React.FC = () => {
 
               <div className="demo-subchart">
                 <h3 className="demo-subchart-title">Education Level</h3>
+                <p className="cluster-survey-question">What is your educational background? Check the highest level of education you have attained.</p>
                 <HorizontalBarChart
                   items={chartData.education}
                   title="Education Level"
@@ -355,9 +359,7 @@ const DemographicsPage: React.FC = () => {
 
               <div className="demo-subchart">
                 <h3 className="demo-subchart-title">Household Size</h3>
-                <p style={{ fontSize: 13, color: '#888', margin: '0 0 10px' }}>
-                  Number of people living in the household.
-                </p>
+                <p className="cluster-survey-question">Including yourself, how many people live in your household?</p>
                 <HorizontalBarChart
                   items={chartData.hhSize}
                   title="Household Size"
@@ -373,9 +375,7 @@ const DemographicsPage: React.FC = () => {
 
               <div className="demo-subchart">
                 <h3 className="demo-subchart-title">Household Income</h3>
-                <p style={{ fontSize: 13, color: '#888', margin: '0 0 10px' }}>
-                  Annual household income before taxes (imputed).
-                </p>
+                <p className="cluster-survey-question">Please check the appropriate category for your annual household income before taxes.</p>
                 <HorizontalBarChart
                   items={chartData.income}
                   title="Household Income"
@@ -386,6 +386,7 @@ const DemographicsPage: React.FC = () => {
 
               <div className="demo-subchart">
                 <h3 className="demo-subchart-title">Housing Type</h3>
+                <p className="cluster-survey-question">What best describes the home you currently live in?</p>
                 <PieChart
                   slices={chartData.housUnit}
                   title="Housing Type"
@@ -395,6 +396,7 @@ const DemographicsPage: React.FC = () => {
 
               <div className="demo-subchart">
                 <h3 className="demo-subchart-title">Home Ownership / Tenure</h3>
+                <p className="cluster-survey-question">Do you rent or own your home?</p>
                 <HorizontalBarChart
                   items={chartData.tenure}
                   title="Tenure"
@@ -409,7 +411,8 @@ const DemographicsPage: React.FC = () => {
             <Section id="geographic" title="Geographic">
 
               <div className="demo-subchart">
-                <h3 className="demo-subchart-title">Survey Institution / Metro Area</h3>
+                <h3 className="demo-subchart-title">Metro Area</h3>
+                <p className="cluster-survey-question">Metropolitan area of survey respondents, based on survey institution (ASU = Phoenix, GT = Atlanta, USF = Tampa, UT = Austin).</p>
                 <HorizontalBarChart
                   items={chartData.institution}
                   title="Survey Institution"
@@ -420,6 +423,7 @@ const DemographicsPage: React.FC = () => {
 
               <div className="demo-subchart">
                 <h3 className="demo-subchart-title">Home State</h3>
+                <p className="cluster-survey-question">Respondents' home state based on reported home address.</p>
                 <HorizontalBarChart
                   items={chartData.state}
                   title="Home State"

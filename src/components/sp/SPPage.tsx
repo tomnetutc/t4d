@@ -2,42 +2,54 @@ import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react'
 import { useParams } from 'react-router-dom';
 import {
   loadSurveyData, SurveyRow,
-  computeGenericCounts, computeDistribution,
+  computeGenericCounts,
 } from '../../utils/dataLoader';
 import { useFilters } from '../../context/FilterContext';
 import { useCurrentCluster } from '../../context/CurrentClusterContext';
 import TopMenu from '../TopMenu/TopMenu';
 import GenericStackedBarChart, { GenericChartVariable } from '../charts/GenericStackedBarChart';
-import HorizontalBarChart, { BarItem } from '../charts/HorizontalBarChart';
 import {
   SP_NAV,
-  SP1_CATS, SP1_SHORT, SP1_SCENARIOS,
-  SP2_RANK_CATS, SP2_RANK_COLORS, SP2_RANK_SHORT,
-  SP2_SCEN1_VARIABLES, SP2_SCEN2_VARIABLES,
-  SP_RANK_CATS, SP_RANK_COLORS, SP_RANK_SHORT, SP_RANK_VARIABLES,
+  SP1_CATS, SP1_COLORS, SP1_SHORT_LABELS, SP1_PURPOSES, SP1_PURPOSE_NORMALIZE, SP1_SCENARIOS,
+  SP2_RANK_CATS, SP2_RANK_COLORS, SP2_RANK_SHORT, SP2_COMBINED_VARIABLES,
+  SP_RANK_CATS, SP_RANK_COLORS, SP_RANK_SHORT,
+  SP_RANK_VARIABLES, SP_RANK_AIRPORT_VARIABLES, SP_RANK_PURPOSES,
 } from './spData';
 import './SPPage.css';
 
 const TOP_MENU_H = 65;
+const SP1_SKIP = new Set(['Seen but not answered', 'Missing (other)']);
 
 /* ── helpers ─────────────────────────────────────────────── */
-function toOrderedItems(
-  data: SurveyRow[], variable: string, cats: string[], labelMap?: Record<string, string>
-): BarItem[] {
-  const dist = computeDistribution(data, variable);
-  const total = dist.reduce((a, b) => a + b.count, 0);
-  return cats
-    .map(cat => {
-      const found = dist.find(d => d.label === cat);
-      return {
-        label: labelMap?.[cat] ?? cat,
-        fullLabel: cat,
-        count: found?.count ?? 0,
-        total,
-      };
-    })
-    .filter(it => it.count > 0)
-    .sort((a, b) => b.count - a.count);
+
+/**
+ * Aggregate SP1 choices across all 3 scenario positions.
+ * Returns one GenericChartVariable per trip purpose (rows = purposes, stacks = private/shared).
+ */
+function computeSP1Stacked(data: SurveyRow[]): GenericChartVariable[] {
+  const pvt: Record<string, number> = { 'Social/Leisure': 0, 'Shopping': 0, 'Work/School': 0 };
+  const shr: Record<string, number> = { 'Social/Leisure': 0, 'Shopping': 0, 'Work/School': 0 };
+
+  for (const row of data) {
+    for (const i of [1, 2, 3]) {
+      const motive     = row[`SP1_Scen${i}_Motive`] as string;
+      const answer     = row[`SP1_Scen${i}_Answer`]  as string;
+      const normalized = SP1_PURPOSE_NORMALIZE[motive];
+      if (!normalized || !answer || SP1_SKIP.has(answer)) continue;
+      if (answer === SP1_CATS[0]) pvt[normalized]++;
+      else if (answer === SP1_CATS[1]) shr[normalized]++;
+    }
+  }
+
+  return SP1_PURPOSES.map(purpose => ({
+    key:        purpose,
+    shortLabel: purpose,
+    counts: {
+      [SP1_CATS[0]]: pvt[purpose],
+      [SP1_CATS[1]]: shr[purpose],
+    },
+    total: pvt[purpose] + shr[purpose],
+  }));
 }
 
 const SPPage: React.FC = () => {
@@ -108,38 +120,43 @@ const SPPage: React.FC = () => {
 
   // ── Pre-compute all chart data ───────────────────────────────
   const chartData = useMemo(() => {
-    // SP1: Private vs. Shared — per scenario
-    const sp1Scenarios = SP1_SCENARIOS.map(v => ({
-      label: v.shortLabel,
-      items: toOrderedItems(filteredData, v.key, SP1_CATS, SP1_SHORT),
-    }));
+    // SP1: choice by trip purpose across all 3 scenario positions (stacked private|shared)
+    const sp1Stacked = computeSP1Stacked(filteredData);
 
-    // SP2: AV Purchase ranking — Scenario 1
-    const sp2Scen1: GenericChartVariable[] = SP2_SCEN1_VARIABLES.map(v => {
-      const { counts, total } = computeGenericCounts(filteredData, v.key, SP2_RANK_CATS);
-      return { ...v, counts, total };
+    // SP2: AV Purchase ranking — combined across both scenarios A and B
+    const sp2Combined: GenericChartVariable[] = SP2_COMBINED_VARIABLES.map(v => {
+      const a = computeGenericCounts(filteredData, v.keys[0], SP2_RANK_CATS);
+      const b = computeGenericCounts(filteredData, v.keys[1], SP2_RANK_CATS);
+      const counts: Record<string, number> = {};
+      SP2_RANK_CATS.forEach(c => { counts[c] = (a.counts[c] || 0) + (b.counts[c] || 0); });
+      return { key: v.keys[0], shortLabel: v.shortLabel, counts, total: a.total + b.total };
     });
 
-    // SP2: AV Purchase ranking — Scenario 2
-    const sp2Scen2: GenericChartVariable[] = SP2_SCEN2_VARIABLES.map(v => {
-      const { counts, total } = computeGenericCounts(filteredData, v.key, SP2_RANK_CATS);
-      return { ...v, counts, total };
+    // SP-Rank: 7-mode ranking by trip purpose
+    // Airport respondents had 6 alternatives (Bike was not offered)
+    const spRankByPurpose = SP_RANK_PURPOSES.map(p => {
+      const subset = filteredData.filter(r =>
+        ((r['SP_Rank_Purpose_str'] as string) || '').toLowerCase().includes(p.match)
+      );
+      const modeVars = p.key === 'airport' ? SP_RANK_AIRPORT_VARIABLES : SP_RANK_VARIABLES;
+      const vars: GenericChartVariable[] = modeVars.map(v => {
+        const { counts, total } = computeGenericCounts(subset, v.key, SP_RANK_CATS);
+        return { ...v, counts, total };
+      });
+      return { ...p, vars, n: subset.length };
     });
 
-    // SP-Rank: 7-mode ranking
-    const spRank: GenericChartVariable[] = SP_RANK_VARIABLES.map(v => {
-      const { counts, total } = computeGenericCounts(filteredData, v.key, SP_RANK_CATS);
-      return { ...v, counts, total };
-    });
-
-    return { sp1Scenarios, sp2Scen1, sp2Scen2, spRank };
+    return { sp1Stacked, sp2Combined, spRankByPurpose };
   }, [filteredData]);
 
   /* ── Render ──────────────────────────────────────────────── */
-  const Section = ({ id, title, children }: { id: string; title: string; children: React.ReactNode }) => (
+  const Section = ({ id, title, surveyQuestion, children }: {
+    id: string; title: string; surveyQuestion?: string; children: React.ReactNode;
+  }) => (
     <div data-cluster-id={id} ref={setRef(id)} className="cluster-section">
       <div className="cluster-section-header">
         <h2 className="cluster-title">{title}</h2>
+        {surveyQuestion && <p className="cluster-survey-question">{surveyQuestion}</p>}
       </div>
       {children}
     </div>
@@ -160,68 +177,86 @@ const SPPage: React.FC = () => {
         {!loading && !error && (
           <>
             {/* SP1: Private vs. Shared */}
-            <Section id="private-shared" title="Ridehailing SP: Private vs. Shared">
-              <p style={{ fontSize: 13, color: '#888', margin: '0 0 12px' }}>
-                Choice between private and shared ridehailing under varying cost, time, and passenger scenarios.
-              </p>
-              {chartData.sp1Scenarios.map(scen => (
-                <div key={scen.label} className="sp-subchart">
-                  <h3 className="sp-subchart-title">{scen.label}</h3>
-                  <HorizontalBarChart
-                    items={scen.items}
-                    title={scen.label}
-                    showTitle={false}
-                    color="#507DBC"
-                  />
-                </div>
-              ))}
-            </Section>
-
-            {/* SP2: AV Purchase SP */}
-            <Section id="av-purchase" title="AV Purchase SP">
-              <p style={{ fontSize: 13, color: '#888', margin: '0 0 12px' }}>
-                Ranking of buying a regular vehicle, buying an AV, or using AV ridehailing under different price scenarios. (1 = most preferred, 3 = least preferred)
-              </p>
-              <div className="sp-subchart">
-                <h3 className="sp-subchart-title">Scenario 1</h3>
-                <GenericStackedBarChart
-                  variables={chartData.sp2Scen1}
-                  categories={SP2_RANK_CATS}
-                  colors={SP2_RANK_COLORS}
-                  categoryShortLabels={SP2_RANK_SHORT}
-                  title="AV Purchase SP — Scenario 1"
-                  showTitle={false}
-                  showSummaryTable={false}
-                />
+            <Section
+              id="private-shared"
+              title="Ridehailing SP: Private vs. Shared"
+              surveyQuestion="Imagine that you call a ride through a smartphone app. For each of the trip purposes below, check whether you would choose the private (Option 1) or shared (Option 2) ridehailing options based on the trip features presented (trip cost, travel time, and the presence of additional passengers). Select only one option in each row. Note that the travel times for shared ridehailing include both your waiting time and the extra time picking up/dropping off other passengers."
+            >
+              <div className="sp-scenario-table" style={{ marginBottom: 20 }}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Trip Purpose</th>
+                      <th>Option 1: Private ridehailing (e.g., Uber and Lyft)</th>
+                      <th>Option 2: Shared ridehailing (e.g., uberPOOL and Lyft Share)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {SP1_SCENARIOS.map(s => (
+                      <tr key={s.purpose}>
+                        <td><strong>{s.purpose}</strong></td>
+                        <td>{s.privateDesc}</td>
+                        <td>{s.sharedDesc}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-              <div className="sp-subchart">
-                <h3 className="sp-subchart-title">Scenario 2</h3>
-                <GenericStackedBarChart
-                  variables={chartData.sp2Scen2}
-                  categories={SP2_RANK_CATS}
-                  colors={SP2_RANK_COLORS}
-                  categoryShortLabels={SP2_RANK_SHORT}
-                  title="AV Purchase SP — Scenario 2"
-                  showTitle={false}
-                  showSummaryTable={false}
-                />
-              </div>
-            </Section>
 
-            {/* SP-Rank: 7-Mode Ranking */}
-            <Section id="mode-ranking" title="AV Mode Choice SP: 7-Mode Ranking">
-              <p style={{ fontSize: 13, color: '#888', margin: '0 0 12px' }}>
-                Rank 7 transportation alternatives from most to least preferred. (1 = most preferred, 7 = least preferred)
-              </p>
               <GenericStackedBarChart
-                variables={chartData.spRank}
-                categories={SP_RANK_CATS}
-                colors={SP_RANK_COLORS}
-                categoryShortLabels={SP_RANK_SHORT}
-                title="AV Mode Choice SP: 7-Mode Ranking"
+                variables={chartData.sp1Stacked}
+                categories={SP1_CATS}
+                colors={SP1_COLORS}
+                categoryShortLabels={SP1_SHORT_LABELS}
+                title="Ridehailing SP: Private vs. Shared"
                 showTitle={false}
                 showSummaryTable={false}
               />
+            </Section>
+
+            {/* SP2: AV Purchase SP */}
+            <Section
+              id="av-purchase"
+              title="Buy Regular vs. AV vs. AV Ridehailing"
+              surveyQuestion="Suppose AVs are now available for purchase, lease/rent, or to use via automated ridehailing services, and half of the vehicles on the streets are AVs. What would you do when faced with your next car purchase decision in each of the following scenarios? Please rank the alternatives based on your preference (1=most preferred; 3=least preferred). Please do not give the same rank to multiple alternatives."
+            >
+              <GenericStackedBarChart
+                variables={chartData.sp2Combined}
+                categories={SP2_RANK_CATS}
+                colors={SP2_RANK_COLORS}
+                categoryShortLabels={SP2_RANK_SHORT}
+                title="Buy Regular vs. AV vs. AV Ridehailing"
+                showTitle={false}
+                showSummaryTable={false}
+              />
+            </Section>
+
+            {/* SP-Rank: 7-Mode Ranking by trip purpose */}
+            <Section
+              id="mode-ranking"
+              title="AV Mode Choice SP: Mode Ranking by Trip Purpose"
+              surveyQuestion="You have the following options for your transportation. Rank the alternatives listed from most preferred (Rank 1) to least preferred (Rank 7). Please do not give the same rank to multiple alternatives."
+            >
+
+              {chartData.spRankByPurpose.map(({ key, label, vars, n }) => (
+                <div key={key} className="sp-subchart">
+                  <h3 className="sp-subchart-title">
+                    {label}
+                    <span style={{ fontSize: 12, fontWeight: 400, color: '#aaa', marginLeft: 8 }}>
+                      (n = {n.toLocaleString()})
+                    </span>
+                  </h3>
+                  <GenericStackedBarChart
+                    variables={vars}
+                    categories={SP_RANK_CATS}
+                    colors={SP_RANK_COLORS}
+                    categoryShortLabels={SP_RANK_SHORT}
+                    title={label}
+                    showTitle={false}
+                    showSummaryTable={false}
+                  />
+                </div>
+              ))}
             </Section>
           </>
         )}

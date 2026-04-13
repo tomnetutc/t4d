@@ -242,10 +242,11 @@ const TravelPage: React.FC = () => {
   }, [filteredData]);
 
   /* ── Render ──────────────────────────────────────────────── */
-  const Section = ({ id, title, children }: { id: string; title: string; children: React.ReactNode }) => (
+  const Section = ({ id, title, surveyQuestion, children }: { id: string; title: string; surveyQuestion?: string; children: React.ReactNode }) => (
     <div data-cluster-id={id} ref={setRef(id)} className="cluster-section">
       <div className="cluster-section-header">
         <h2 className="cluster-title">{title}</h2>
+        {surveyQuestion && <p className="cluster-survey-question">{surveyQuestion}</p>}
       </div>
       {children}
     </div>
@@ -271,6 +272,7 @@ const TravelPage: React.FC = () => {
               {/* [1] Employment / Student Status */}
               <div className="travel-subchart">
                 <h3 className="travel-subchart-title">Employment / Student Status</h3>
+                <p className="cluster-survey-question">At this time, you are:</p>
                 <HorizontalBarChart
                   items={chartData.employment}
                   title="Employment / Student Status"
@@ -282,9 +284,7 @@ const TravelPage: React.FC = () => {
               {/* [2] Commute Frequency */}
               <div className="travel-subchart">
                 <h3 className="travel-subchart-title">Commute Frequency (days per week)</h3>
-                <p style={{ fontSize: 13, color: '#888', margin: '0 0 10px' }}>
-                  Days per week traveling to work, to school, and telecommuting.
-                </p>
+                <p className="cluster-survey-question">On average, how many days per week do you travel to work or school?</p>
                 <GenericStackedBarChart
                   variables={chartData.comFreq}
                   categories={COMFREQ_CATS}
@@ -299,6 +299,7 @@ const TravelPage: React.FC = () => {
               {/* [3] Commute Distance */}
               <div className="travel-subchart">
                 <h3 className="travel-subchart-title">Commute Distance (miles)</h3>
+                <p className="cluster-survey-question">How far do you live from your main work/school location? (estimate one-way trip distance)</p>
                 <HorizontalBarChart
                   items={chartData.comDistance}
                   title="Commute Distance"
@@ -310,6 +311,7 @@ const TravelPage: React.FC = () => {
               {/* [3] Commute Time */}
               <div className="travel-subchart">
                 <h3 className="travel-subchart-title">One-Way Commute Time (minutes)</h3>
+                <p className="cluster-survey-question">On a typical day, how long does it take you to get from home to your main work/school location (one-way) by the means of transportation you use most often?</p>
                 <HorizontalBarChart
                   items={chartData.comTime}
                   title="One-Way Commute Time"
@@ -321,9 +323,7 @@ const TravelPage: React.FC = () => {
               {/* [4] Primary Commute Mode */}
               <div className="travel-subchart">
                 <h3 className="travel-subchart-title">Primary Commute Mode</h3>
-                <p style={{ fontSize: 13, color: '#888', margin: '0 0 10px' }}>
-                  Means of transportation used most often for commute.
-                </p>
+                <p className="cluster-survey-question">Please choose the means of transportation used most often:</p>
                 <HorizontalBarChart
                   items={chartData.comMode}
                   title="Primary Commute Mode"
@@ -335,10 +335,7 @@ const TravelPage: React.FC = () => {
             </Section>
 
             {/* ── Subsection: Commute Mode Frequency ───────────── */}
-            <Section id="commute-mode-frequency" title="Mode Use for Commute Trips">
-              <p style={{ fontSize: 13, color: '#888', margin: '0 0 12px' }}>
-                Frequency of use for each transportation mode for trips to work/school.
-              </p>
+            <Section id="commute-mode-frequency" title="Mode Use for Commute Trips" surveyQuestion="Considering only your travel to work/school, please indicate how often you typically use each of the following means of transportation.">
               <GenericStackedBarChart
                 variables={chartData.comModeFreq}
                 categories={MODEFREQ_CATS}
@@ -351,10 +348,7 @@ const TravelPage: React.FC = () => {
             </Section>
 
             {/* ── Subsection: Non-Commute Mode Frequency ───────── */}
-            <Section id="noncommute-mode-frequency" title="Mode Use for Non-Commute Trips">
-              <p style={{ fontSize: 13, color: '#888', margin: '0 0 12px' }}>
-                Frequency of use for each transportation mode for errands, shopping, social, and recreational trips.
-              </p>
+            <Section id="noncommute-mode-frequency" title="Mode Use for Non-Commute Trips" surveyQuestion="Considering only your errands/shopping/social/recreational trips, please indicate how often you typically use each of the following means of transportation.">
               <GenericStackedBarChart
                 variables={chartData.ncomModeFreq}
                 categories={MODEFREQ_CATS}
@@ -372,9 +366,7 @@ const TravelPage: React.FC = () => {
               {/* [7] Conditions Limiting Travel */}
               <div className="travel-subchart">
                 <h3 className="travel-subchart-title">Conditions Limiting Travel</h3>
-                <p style={{ fontSize: 13, color: '#888', margin: '0 0 10px' }}>
-                  Do you have conditions that prevent or limit driving, transit use, biking, or walking?
-                </p>
+                <p className="cluster-survey-question">Do you have any conditions that prevent or limit you from driving, taking public transit, bicycling, or walking?</p>
                 <GenericStackedBarChart
                   variables={chartData.conditions}
                   categories={CONDITIONS_CATS}
@@ -389,9 +381,7 @@ const TravelPage: React.FC = () => {
               {/* [8] Average Miles Driven */}
               <div className="travel-subchart">
                 <h3 className="travel-subchart-title">Average Miles Driven per Week</h3>
-                <p style={{ fontSize: 13, color: '#888', margin: '0 0 10px' }}>
-                  Average miles driven in a typical week, excluding on-the-clock driving.
-                </p>
+                <p className="cluster-survey-question">On average, how many miles do you drive in a week? Please do not include miles you drive while "on the clock" for your job.</p>
                 <HorizontalBarChart
                   items={chartData.milesDriven}
                   title="Average Miles Driven per Week"
@@ -403,9 +393,7 @@ const TravelPage: React.FC = () => {
               {/* [9] Adults with Driving Limitations */}
               <div className="travel-subchart">
                 <h3 className="travel-subchart-title">Adults in Household with Driving Limitations</h3>
-                <p style={{ fontSize: 13, color: '#888', margin: '0 0 10px' }}>
-                  Does anyone in your household have a condition that partially or fully limits their ability to drive?
-                </p>
+                <p className="cluster-survey-question">Are there any adults (i.e., 18 years old or older) in your household, other than yourself, with conditions that either partially or fully limit their ability to drive?</p>
                 <PieChart
                   slices={chartData.adultsNoDrive}
                   title="Adults with Driving Limitations"
@@ -416,10 +404,7 @@ const TravelPage: React.FC = () => {
             </Section>
 
             {/* ── Subsection: Deliveries to Home ───────────────── */}
-            <Section id="deliveries" title="Deliveries to Home">
-              <p style={{ fontSize: 13, color: '#888', margin: '0 0 12px' }}>
-                In the past 30 days, how many times were the following items delivered to your home?
-              </p>
+            <Section id="deliveries" title="Deliveries to Home" surveyQuestion="In the past 30 days, about how many times did you have each of the following delivered to your home?">
               <GenericStackedBarChart
                 variables={chartData.deliveryFreq}
                 categories={DELIVERY_CATS}
@@ -432,14 +417,11 @@ const TravelPage: React.FC = () => {
             </Section>
 
             {/* ── Subsection: Long-Distance Travel ─────────────── */}
-            <Section id="long-distance" title="Long-Distance Travel">
+            <Section id="long-distance" title="Long-Distance Travel" surveyQuestion="About how many long-distance trips (at least 75 miles one-way) did you make since the beginning of the year, using each of the following modes of transportation?">
 
               {/* [11] Long-Distance Trips (grouped bar — means) */}
               <div className="travel-subchart">
                 <h3 className="travel-subchart-title">Long-Distance Trip Frequency by Mode & Purpose</h3>
-                <p style={{ fontSize: 13, color: '#888', margin: '0 0 10px' }}>
-                  Average number of long-distance trips (75+ miles one-way) since the beginning of the year, by mode and purpose.
-                </p>
                 <HorizontalGroupedBarChart
                   groups={chartData.ldGroups}
                   series={LD_SERIES}
@@ -453,9 +435,7 @@ const TravelPage: React.FC = () => {
               {/* [12] Airport Visits */}
               <div className="travel-subchart">
                 <h3 className="travel-subchart-title">Airport Visits</h3>
-                <p style={{ fontSize: 13, color: '#888', margin: '0 0 10px' }}>
-                  Have you visited the local airport to travel or to pick up/drop off someone?
-                </p>
+                <p className="cluster-survey-question">Have you been to the local airport since the beginning of the year to either travel yourself or to pick-up/drop-off someone else who was traveling?</p>
                 <PieChart
                   slices={chartData.airportVisit}
                   title="Airport Visits"

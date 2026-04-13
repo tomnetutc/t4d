@@ -65,6 +65,46 @@ export const CHANGE_VARIABLES: VarDef[] = [
   { key: 'rh_change_walk',      shortLabel: 'Walking',                  fullQuestion: 'Walking' },
 ];
 
+// ── Ridehailing usage — numeric bins ────────────────────────
+export const RH_WAITTIME_BINS = [
+  { label: '0–5 min',  min: 0,  max: 6 },
+  { label: '6–10 min', min: 6,  max: 11 },
+  { label: '11–15 min',min: 11, max: 16 },
+  { label: '16–20 min',min: 16, max: 21 },
+  { label: '21+ min',  min: 21, max: Infinity },
+];
+export const RH_DURATION_BINS = [
+  { label: '<10 min',   min: 0,  max: 10 },
+  { label: '10–20 min', min: 10, max: 21 },
+  { label: '21–30 min', min: 21, max: 31 },
+  { label: '31–45 min', min: 31, max: 46 },
+  { label: '46–60 min', min: 46, max: 61 },
+  { label: '60+ min',   min: 61, max: Infinity },
+];
+export const RH_TRIPCOST_BINS = [
+  { label: '$1–$9',   min: 1,  max: 10 },
+  { label: '$10–$19', min: 10, max: 20 },
+  { label: '$20–$29', min: 20, max: 30 },
+  { label: '$30–$49', min: 30, max: 50 },
+  { label: '$50+',    min: 50, max: Infinity },
+];
+
+// Additional time willing to wait for shared ridehailing (50% discount)
+export const RH_ADDTIME_CATS = [
+  '1-5 more minutes',
+  '6-10 more minutes',
+  '11-15 more minutes',
+  '16 or more minutes',
+  'I would not have used shared ridehailing for the trip',
+];
+export const RH_ADDTIME_SHORT: Record<string, string> = {
+  '1-5 more minutes':  '1–5 min',
+  '6-10 more minutes': '6–10 min',
+  '11-15 more minutes':'11–15 min',
+  '16 or more minutes':'16+ min',
+  'I would not have used shared ridehailing for the trip': 'Would not use shared',
+};
+
 // ── Ridehailing usage — categorical variables ────────────────
 export const RH_SERVICETYPE_CATS = [
   'Private ridehailing (e.g., Uber, Lyft)',
@@ -100,7 +140,11 @@ export const RH_ALTERNMODE_CATS = [
   'Drive private vehicle, alone',
   'Drive private vehicle, with passengers',
   'Ride private vehicle, with others',
+  'Use taxi',
   'Ride the bus',
+  'Ride the light rail',
+  'Walk',
+  'Use a bikesharing or e-scooter sharing service',
   'Ride my personal bicycle or scooter',
   'I would not have made this trip',
   'Other',
@@ -140,13 +184,16 @@ export const BES_REASONS: VarDef[] = [
   { key: 'bes_reas_joy',      shortLabel: 'Enjoyment',                     selectedValue: 'Just to enjoy the ride/try the new service' },
 ];
 export const BES_ALTERNMODE_CATS = [
+  'Walk',
   'Drive private vehicle, alone',
+  'Use Uber/Lyft',
   'Drive private vehicle, with others',
+  'I would not have made this trip',
   'Ride in private vehicle, with others',
   'Ride the bus',
+  'Use my own bike or scooter',
   'Ride the light rail',
-  'I would not have made this trip',
-  'Other',
+  'Use taxi',
 ];
 
 // Sidebar nav items
@@ -155,6 +202,7 @@ export const MOBILITY_NAV = [
   { id: 'ridehailing-attitudes',  label: 'Attitudes',                   path: '/mobility/ridehailing-attitudes' },
   { id: 'ridehailing-usage',      label: 'Usage Context (Trip Details)', path: '/mobility/ridehailing-usage' },
   { id: 'ridehailing-spending',   label: 'Monthly Expenditures',        path: '/mobility/ridehailing-spending' },
+  { id: 'ridehailing-shared',     label: 'Shared Ridehailing Preference', path: '/mobility/ridehailing-shared' },
   { id: 'ridehailing-impact',     label: 'Impact on Other Modes',       path: '/mobility/ridehailing-impact' },
   { id: 'bikescooter-trips',      label: 'Last Trip Details',           path: '/mobility/bikescooter-trips' },
   { id: 'bikescooter-reasons',    label: 'Reasons for Using Service',   path: '/mobility/bikescooter-reasons' },

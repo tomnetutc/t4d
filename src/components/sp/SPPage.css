@@ -6,22 +6,39 @@
 }
 
 .cluster-section {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  padding: 24px 24px 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 28px 32px;
   margin-bottom: 20px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cluster-section:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
 }
 
 .cluster-section-header {
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .cluster-title {
-  font-size: 20px;
-  font-weight: 700;
-  color: #333;
-  margin: 0 0 4px;
+  font-size: 1.35rem;
+  font-weight: bold;
+  color: #222;
+  margin: 0 0 8px;
+  text-align: left;
+}
+
+.cluster-survey-question {
+  font-size: 16px;
+  font-weight: normal;
+  color: #000000;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  line-height: 1.5;
 }
 
 .clusters-loading {
@@ -71,4 +88,36 @@
   font-weight: 600;
   color: #444;
   margin: 0 0 10px;
+}
+
+/* Scenario context table */
+.sp-scenario-table {
+  margin-bottom: 14px;
+  overflow-x: auto;
+}
+
+.sp-scenario-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  color: #444;
+}
+
+.sp-scenario-table th {
+  background: #f0f4fa;
+  color: #333;
+  font-weight: 600;
+  padding: 6px 10px;
+  text-align: left;
+  border: 1px solid #dde3ed;
+}
+
+.sp-scenario-table td {
+  padding: 5px 10px;
+  border: 1px solid #e8ecf2;
+  background: #fff;
+}
+
+.sp-scenario-table tr:nth-child(even) td {
+  background: #f7f9fc;
 }

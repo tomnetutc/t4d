@@ -282,10 +282,11 @@ const HouseholdPage: React.FC = () => {
   }, [filteredData]);
 
   /* ── Render ──────────────────────────────────────────────── */
-  const Section = ({ id, title, children }: { id: string; title: string; children: React.ReactNode }) => (
+  const Section = ({ id, title, surveyQuestion, children }: { id: string; title: string; surveyQuestion?: string; children: React.ReactNode }) => (
     <div data-cluster-id={id} ref={setRef(id)} className="cluster-section">
       <div className="cluster-section-header">
         <h2 className="cluster-title">{title}</h2>
+        {surveyQuestion && <p className="cluster-survey-question">{surveyQuestion}</p>}
       </div>
       {children}
     </div>
@@ -310,6 +311,7 @@ const HouseholdPage: React.FC = () => {
 
               <div className="hh-subchart">
                 <h3 className="hh-subchart-title">Driver's License</h3>
+                <p className="cluster-survey-question">Do you have a driver's license?</p>
                 <PieChart
                   slices={chartData.driver}
                   title="Driver's License"
@@ -319,9 +321,7 @@ const HouseholdPage: React.FC = () => {
 
               <div className="hh-subchart">
                 <h3 className="hh-subchart-title">Household Vehicles Available</h3>
-                <p style={{ fontSize: 13, color: '#888', margin: '0 0 10px' }}>
-                  Number of motorized vehicles available to the household.
-                </p>
+                <p className="cluster-survey-question">How many motorized vehicles (including four-wheelers and two-wheelers) are available in your household?</p>
                 <HorizontalBarChart
                   items={chartData.hhVeh}
                   title="Household Vehicles"
@@ -332,9 +332,7 @@ const HouseholdPage: React.FC = () => {
 
               <div className="hh-subchart">
                 <h3 className="hh-subchart-title">Licensed Drivers in Household</h3>
-                <p style={{ fontSize: 13, color: '#888', margin: '0 0 10px' }}>
-                  Number of people in the household with a driver's license.
-                </p>
+                <p className="cluster-survey-question">How many people in your household have a driver's license (including you)?</p>
                 <HorizontalBarChart
                   items={chartData.hhDrivers}
                   title="Household Drivers"
@@ -350,6 +348,7 @@ const HouseholdPage: React.FC = () => {
 
               <div className="hh-subchart">
                 <h3 className="hh-subchart-title">Vehicle 1 — Fuel Type</h3>
+                <p className="cluster-survey-question">Please provide details of all motorized vehicles available to your household. Report the vehicle you use most often as Vehicle 1.</p>
                 <HorizontalBarChart
                   items={chartData.vehFuel}
                   title="Vehicle 1 Fuel Type"
@@ -360,6 +359,7 @@ const HouseholdPage: React.FC = () => {
 
               <div className="hh-subchart">
                 <h3 className="hh-subchart-title">Vehicle 1 — Annual Miles Driven</h3>
+                <p className="cluster-survey-question">Annual miles driven by all drivers (estimate) for Vehicle 1.</p>
                 <HorizontalBarChart
                   items={chartData.vehMiles}
                   title="Vehicle 1 Annual Miles"
@@ -370,6 +370,7 @@ const HouseholdPage: React.FC = () => {
 
               <div className="hh-subchart">
                 <h3 className="hh-subchart-title">Vehicle 1 — Model Year</h3>
+                <p className="cluster-survey-question">Model year of Vehicle 1.</p>
                 <HorizontalBarChart
                   items={chartData.vehModYr}
                   title="Vehicle 1 Model Year"
@@ -380,9 +381,7 @@ const HouseholdPage: React.FC = () => {
 
               <div className="hh-subchart">
                 <h3 className="hh-subchart-title">Vehicle 1 — Top Makes</h3>
-                <p style={{ fontSize: 13, color: '#888', margin: '0 0 10px' }}>
-                  Top {TOP_MAKES_COUNT} most common vehicle makes (primary household vehicle).
-                </p>
+                <p className="cluster-survey-question">Vehicle make of Vehicle 1.</p>
                 <HorizontalBarChart
                   items={chartData.vehMakes}
                   title="Top Vehicle Makes"
@@ -393,9 +392,7 @@ const HouseholdPage: React.FC = () => {
 
               <div className="hh-subchart">
                 <h3 className="hh-subchart-title">ADAS Features in Vehicle 1</h3>
-                <p style={{ fontSize: 13, color: '#888', margin: '0 0 10px' }}>
-                  Advanced driver assistance features present in the primary household vehicle.
-                </p>
+                <p className="cluster-survey-question">Which of the following driving assistance features does Vehicle 1 have? Please check all that apply.</p>
                 <GenericStackedBarChart
                   variables={chartData.adasVars}
                   categories={ADAS_CATS}
@@ -414,6 +411,7 @@ const HouseholdPage: React.FC = () => {
 
               <div className="hh-subchart">
                 <h3 className="hh-subchart-title">Housing Type</h3>
+                <p className="cluster-survey-question">What best describes the home you currently live in?</p>
                 <PieChart
                   slices={chartData.housUnit}
                   title="Housing Type"
@@ -423,6 +421,7 @@ const HouseholdPage: React.FC = () => {
 
               <div className="hh-subchart">
                 <h3 className="hh-subchart-title">Home Ownership / Tenure</h3>
+                <p className="cluster-survey-question">Do you rent or own your home?</p>
                 <HorizontalBarChart
                   items={chartData.tenure}
                   title="Tenure"
@@ -433,6 +432,7 @@ const HouseholdPage: React.FC = () => {
 
               <div className="hh-subchart">
                 <h3 className="hh-subchart-title">Year Moved to Current Address</h3>
+                <p className="cluster-survey-question">What year did you move to your current address (e.g., 2010)?</p>
                 <HorizontalBarChart
                   items={chartData.yrMoved}
                   title="Year Moved"
@@ -443,9 +443,7 @@ const HouseholdPage: React.FC = () => {
 
               <div className="hh-subchart">
                 <h3 className="hh-subchart-title">Chose Current Home Location</h3>
-                <p style={{ fontSize: 13, color: '#888', margin: '0 0 10px' }}>
-                  Did the respondent actively choose where they currently live?
-                </p>
+                <p className="cluster-survey-question">Did you choose your current home location?</p>
                 <HorizontalBarChart
                   items={chartData.homeChosen}
                   title="Chose Home Location"
@@ -457,10 +455,7 @@ const HouseholdPage: React.FC = () => {
             </Section>
 
             {/* ── Subsection: Home Location Preferences ─────── */}
-            <Section id="home-location" title="Home Location Preferences">
-              <p style={{ fontSize: 13, color: '#888', margin: '0 0 12px' }}>
-                Features the respondent did or would seek when choosing a home and neighborhood.
-              </p>
+            <Section id="home-location" title="Home Location Preferences" surveyQuestion="When choosing your home and neighborhood, how important were the following features to you?">
               <GenericStackedBarChart
                 variables={chartData.homeLocPrefs}
                 categories={HOMELOC_CATS}

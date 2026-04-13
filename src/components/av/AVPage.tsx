@@ -192,10 +192,11 @@ const AVPage: React.FC = () => {
   }, [filteredData]);
 
   /* ── Render ──────────────────────────────────────────────── */
-  const Section = ({ id, title, meta, children }: { id: string; title: string; meta?: string; children: React.ReactNode }) => (
+  const Section = ({ id, title, surveyQuestion, children }: { id: string; title: string; surveyQuestion?: string; children: React.ReactNode }) => (
     <div data-cluster-id={id} ref={setRef(id)} className="cluster-section">
       <div className="cluster-section-header">
         <h2 className="cluster-title">{title}</h2>
+        {surveyQuestion && <p className="cluster-survey-question">{surveyQuestion}</p>}
       </div>
       {children}
     </div>
@@ -216,7 +217,7 @@ const AVPage: React.FC = () => {
         {!loading && !error && (
           <>
             {/* E1: Familiarity */}
-            <Section id="familiarity" title="AV Familiarity">
+            <Section id="familiarity" title="AV Familiarity" surveyQuestion="Which of the following statements best describes your familiarity with AVs?">
               <HorizontalBarChart
                 items={chartData.familiarity}
                 title="AV Familiarity"
@@ -229,6 +230,7 @@ const AVPage: React.FC = () => {
             <Section id="purchase-wtp" title="AV Purchase & Willingness to Pay">
               <div className="av-subchart">
                 <h3 className="av-subchart-title">AV Purchase Intentions</h3>
+                <p className="cluster-survey-question">When do you expect to buy an AV?</p>
                 <HorizontalBarChart
                   items={chartData.timePurchase}
                   title="AV Purchase Intentions"
@@ -238,6 +240,7 @@ const AVPage: React.FC = () => {
               </div>
               <div className="av-subchart">
                 <h3 className="av-subchart-title">Willingness to Pay</h3>
+                <p className="cluster-survey-question">Suppose you were looking to purchase a new vehicle. The regular human-driven model of the vehicle you wish to purchase costs $25,000. How much more would you be willing to pay for a fully autonomous version of the vehicle?</p>
                 <HorizontalBarChart
                   items={chartData.willPay}
                   title="Willingness to Pay"
@@ -248,7 +251,7 @@ const AVPage: React.FC = () => {
             </Section>
 
             {/* E2: General AV Attitudes */}
-            <Section id="attitudes" title="General Attitudes Toward AVs">
+            <Section id="attitudes" title="General Attitudes Toward AVs" surveyQuestion="Please rate your level of agreement with each of the following statements about AVs.">
               <StackedLikertChart
                 variables={chartData.avAtt}
                 title="General Attitudes Toward AVs"
@@ -258,7 +261,7 @@ const AVPage: React.FC = () => {
             </Section>
 
             {/* E10: Safety & Policy */}
-            <Section id="safety-policy" title="AV Policy">
+            <Section id="safety-policy" title="AV Policy" surveyQuestion="To what extent do you agree with the following statements for AVs?">
               <StackedLikertChart
                 variables={chartData.avPolicy}
                 title="AV Policy"
@@ -268,7 +271,7 @@ const AVPage: React.FC = () => {
             </Section>
 
             {/* E7: AV Ridehailing Attitudes */}
-            <Section id="ridehailing-attitudes" title="AV Ridehailing Attitudes">
+            <Section id="ridehailing-attitudes" title="AV Ridehailing Attitudes" surveyQuestion="Suppose ridehailing companies will start using AVs. Please rate your level of agreement with the following statements.">
               <StackedLikertChart
                 variables={chartData.avRh}
                 title="AV Ridehailing Attitudes"
@@ -278,10 +281,7 @@ const AVPage: React.FC = () => {
             </Section>
 
             {/* E8: Vehicle Ownership */}
-            <Section id="vehicle-ownership" title="Change in Vehicle Ownership">
-              <p style={{ fontSize: 13, color: '#888', margin: '0 0 12px' }}>
-                How might your household's car ownership change when AVs become available?
-              </p>
+            <Section id="vehicle-ownership" title="Change in Vehicle Ownership" surveyQuestion="Considering the number of cars your household currently owns, how might that change when AVs are available for purchase or use as a ridehailing service?">
               <HorizontalBarChart
                 items={chartData.ownChange}
                 title="Change in Vehicle Ownership"
@@ -291,10 +291,7 @@ const AVPage: React.FC = () => {
             </Section>
 
             {/* E9: Mode Choice Impact */}
-            <Section id="mode-choice" title="AV Impact on Mode Choice">
-              <p style={{ fontSize: 13, color: '#888', margin: '0 0 12px' }}>
-                If you had access to an AV, how would your use of each mode change?
-              </p>
+            <Section id="mode-choice" title="AV Impact on Mode Choice" surveyQuestion="Suppose you have regular access to an AV. How would your use of different modes of transportation change in such a future?">
               <GenericStackedBarChart
                 variables={chartData.modeChange}
                 categories={AV_MODECHANGE_CATS}
@@ -307,10 +304,7 @@ const AVPage: React.FC = () => {
             </Section>
 
             {/* E3: Commute */}
-            <Section id="commute" title="AV & Commute">
-              <p style={{ fontSize: 13, color: '#888', margin: '0 0 12px' }}>
-                How much longer would you be willing to commute if you had access to an AV?
-              </p>
+            <Section id="commute" title="AV & Commute" surveyQuestion="Imagine a future when you have regular access to an AV and you can do other activities while riding in an AV. How much longer would you be willing to commute in an AV (compared to your current commute)?">
               <HorizontalBarChart
                 items={chartData.commute}
                 title="AV & Commute"
@@ -320,14 +314,7 @@ const AVPage: React.FC = () => {
             </Section>
 
             {/* E12: Multitasking */}
-            <Section id="travel-experiences" title="Expected Travel Experiences">
-              <p style={{ fontSize: 13, color: '#888', margin: '0 0 12px' }}>
-                What activities would you do during a trip in an AV? (respondents selected up to three)
-                <br />
-                <span style={{ fontSize: 12, color: '#aaa' }}>
-                  * "Interact with passengers" % is among respondents who indicated willingness to ride in an AV only.
-                </span>
-              </p>
+            <Section id="travel-experiences" title="Expected Travel Experiences" surveyQuestion="Suppose you are traveling with family members to a neighborhood park in an AV. Which of the following would you do in the vehicle during your trip?">
               <HorizontalBarChart
                 items={chartData.multiTask}
                 title="Expected Travel Experiences"
@@ -338,10 +325,7 @@ const AVPage: React.FC = () => {
             </Section>
 
             {/* E4: Lifestyle Changes */}
-            <Section id="lifestyle-changes" title="Anticipated Changes in Lifestyles">
-              <p style={{ fontSize: 13, color: '#888', margin: '0 0 12px' }}>
-                How likely are you to make each of the following changes if you had access to an AV?
-              </p>
+            <Section id="lifestyle-changes" title="Anticipated Changes in Lifestyles" surveyQuestion="Imagine a future when you can access an AV. How likely would you change in each of the following ways?">
               <GenericStackedBarChart
                 variables={chartData.lifestyle}
                 categories={AV_LIFESTYLE_CATS}
