@@ -30,10 +30,10 @@ const TOP_MENU_H = 65;
 function toCatItems(dist: { label: string; count: number }[], total: number): BarItem[] {
   return dist.map(d => ({ label: d.label, count: d.count, total }));
 }
-function toOrderedItems(data: SurveyRow[], variable: string, cats: string[], labelMap?: Record<string, string>): BarItem[] {
+function toOrderedItems(data: SurveyRow[], variable: string, cats: string[], labelMap?: Record<string, string>, preserveOrder = false): BarItem[] {
   const dist = computeDistribution(data, variable);
   const total = dist.reduce((a, b) => a + b.count, 0);
-  return cats
+  const items = cats
     .map(cat => {
       const found = dist.find(d => d.label === cat);
       return {
@@ -43,8 +43,8 @@ function toOrderedItems(data: SurveyRow[], variable: string, cats: string[], lab
         total,
       };
     })
-    .filter(it => it.count > 0)
-    .sort((a, b) => b.count - a.count);
+    .filter(it => it.count > 0);
+  return preserveOrder ? items : items.sort((a, b) => b.count - a.count);
 }
 const SKIP_SET = new Set(['Seen but not answered', 'Appropriate skip', 'Missing (other)', 'Option not selected']);
 
@@ -190,7 +190,7 @@ const MobilityPage: React.FC = () => {
     // 6. Bike/Scooter trip details
     const besService: BarItem[] = toOrderedItems(filteredData, 'bes_servicetype', BES_SERVICETYPE_CATS);
     const besTime: BarItem[] = toOrderedItems(filteredData, 'bes_triptime', BES_TRIPTIME_CATS);
-    const besLength: BarItem[] = toOrderedItems(filteredData, 'bes_triplength', BES_TRIPLENGTH_CATS);
+    const besLength: BarItem[] = toOrderedItems(filteredData, 'bes_triplength', BES_TRIPLENGTH_CATS, undefined, true);
     const besPurpose: BarItem[] = toOrderedItems(filteredData, 'bes_purpose', BES_PURPOSE_CATS, BES_PURPOSE_LABELS);
 
     // 7. BES Reasons (binary)

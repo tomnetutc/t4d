@@ -21,6 +21,7 @@ interface Props {
   showTitle?: boolean;
   data?: SurveyRow[];
   showSummaryTable?: boolean;
+  respondentCount?: number;
 }
 
 function wrapText(
@@ -51,7 +52,7 @@ function wrapText(
 
 const GenericStackedBarChart: React.FC<Props> = ({
   variables, categories, colors, categoryShortLabels,
-  title, showTitle = true, showSummaryTable = false,
+  title, showTitle = true, showSummaryTable = false, respondentCount,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -227,7 +228,7 @@ const GenericStackedBarChart: React.FC<Props> = ({
       </div>
       <svg ref={svgRef} />
       <div className={styles.respondentCount}>
-        Number of respondents: {variables[0]?.total.toLocaleString() ?? 0}
+        Number of respondents: {(respondentCount ?? variables[0]?.total ?? 0).toLocaleString()}
       </div>
       {showSummaryTable && (
         <>

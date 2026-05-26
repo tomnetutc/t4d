@@ -31,11 +31,11 @@ const SKIP_SET = new Set(['Seen but not answered', 'Appropriate skip', 'Missing 
 
 /* ── helpers ─────────────────────────────────────────────── */
 function toOrderedItems(
-  data: SurveyRow[], variable: string, cats: string[], labelMap?: Record<string, string>
+  data: SurveyRow[], variable: string, cats: string[], labelMap?: Record<string, string>, preserveOrder = false
 ): BarItem[] {
   const dist = computeDistribution(data, variable);
   const total = dist.reduce((a, b) => a + b.count, 0);
-  return cats
+  const items = cats
     .map(cat => {
       const found = dist.find(d => d.label === cat);
       return {
@@ -45,8 +45,8 @@ function toOrderedItems(
         total,
       };
     })
-    .filter(it => it.count > 0)
-    .sort((a, b) => b.count - a.count);
+    .filter(it => it.count > 0);
+  return preserveOrder ? items : items.sort((a, b) => b.count - a.count);
 }
 
 function binNumeric(
@@ -202,7 +202,7 @@ const TravelPage: React.FC = () => {
     });
 
     // [8] Average miles driven
-    const milesDriven: BarItem[] = toOrderedItems(filteredData, 'avgmlsdriven', MILES_CATS, MILES_SHORT);
+    const milesDriven: BarItem[] = toOrderedItems(filteredData, 'avgmlsdriven', MILES_CATS, MILES_SHORT, true);
 
     // [9] Adults with driving limitations (pie)
     const adultsNoDrive: PieSlice[] = buildPieSlices(filteredData, 'hh_adultnodrive', [

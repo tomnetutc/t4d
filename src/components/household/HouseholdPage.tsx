@@ -30,11 +30,11 @@ const SKIP_SET = new Set(['Seen but not answered', 'Appropriate skip', 'Missing 
 
 /* ── helpers ─────────────────────────────────────────────── */
 function toOrderedItems(
-  data: SurveyRow[], variable: string, cats: string[], labelMap?: Record<string, string>
+  data: SurveyRow[], variable: string, cats: string[], labelMap?: Record<string, string>, preserveOrder = false
 ): BarItem[] {
   const dist = computeDistribution(data, variable);
   const total = dist.reduce((a, b) => a + b.count, 0);
-  return cats
+  const items = cats
     .map(cat => {
       const found = dist.find(d => d.label === cat);
       return {
@@ -44,8 +44,8 @@ function toOrderedItems(
         total,
       };
     })
-    .filter(it => it.count > 0)
-    .sort((a, b) => b.count - a.count);
+    .filter(it => it.count > 0);
+  return preserveOrder ? items : items.sort((a, b) => b.count - a.count);
 }
 
 function buildPieSlices(
@@ -225,7 +225,7 @@ const HouseholdPage: React.FC = () => {
     const vehFuel: BarItem[] = toOrderedItems(filteredData, 'veh1_fuel', VEHICLE_FUEL_CATS, VEHICLE_FUEL_SHORT);
 
     // [4b] Annual miles
-    const vehMiles: BarItem[] = toOrderedItems(filteredData, 'veh1_miles', VEHICLE_MILES_CATS, VEHICLE_MILES_SHORT);
+    const vehMiles: BarItem[] = toOrderedItems(filteredData, 'veh1_miles', VEHICLE_MILES_CATS, VEHICLE_MILES_SHORT, true);
 
     // [4c] Model year (binned)
     const vehModYr: BarItem[] = binNumeric(filteredData, 'veh1_modyr', MODEL_YEAR_BINS);

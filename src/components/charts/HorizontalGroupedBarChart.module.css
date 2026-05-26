@@ -22,10 +22,10 @@
 .bar { height: 100%; border-radius: 3px; width: 0; transition: width 0.75s ease; }
 .barValue { font-size: 12px; color: #555; width: 72px; flex-shrink: 0; }
 
-.respondentCount { font-size: 11px; color: #999; margin-top: 8px; }
+.respondentCount { font-size: 11px; color: #999; margin-top: 8px; padding-left: 16px; }
 .note { font-size: 11px; color: #aaa; margin-top: 4px; font-style: italic; }
 
-.statsToggle { margin-top: 12px; background: white; color: #333; border: 1px solid #ced4da; border-radius: 4px; padding: 5px 14px; font-size: 13px; font-weight: 500; cursor: pointer; }
+.statsToggle { display: block; margin-top: 12px; background: white; color: #333; border: 1px solid #ced4da; border-radius: 4px; padding: 5px 14px; font-size: 13px; font-weight: 500; cursor: pointer; }
 .statsToggle:hover { background: #f0f0f0; }
 .summaryTableWrap { overflow-x: auto; margin-top: 12px; }
 .summaryTable { width: 100%; border-collapse: collapse; font-size: 13px; }

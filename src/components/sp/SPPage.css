@@ -35,10 +35,16 @@
 .cluster-survey-question {
   font-size: 16px;
   font-weight: normal;
+  font-style: normal;
   color: #000000;
   font-family: Arial, sans-serif;
   margin: 0;
   line-height: 1.5;
+}
+
+/* Question text rendered outside the section header (SP2, SP-Rank) */
+.sp-rank-question {
+  margin-bottom: 14px;
 }
 
 .clusters-loading {
@@ -68,6 +74,65 @@
 .clusters-error {
   padding: 24px;
   color: #c0392b;
+}
+
+/* ── Tab selector (Scenario / Trip Purpose) ──────────────────── */
+.sp-tab-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.sp-tab-group-label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #444;
+  white-space: nowrap;
+}
+
+.sp-tab-pills {
+  display: flex;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.sp-tab {
+  padding: 6px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  background: #f9fafb;
+  color: #555;
+  border: none;
+  border-right: 1px solid #d1d5db;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+.sp-tab:last-child {
+  border-right: none;
+}
+
+.sp-tab:hover:not(.sp-tab--active) {
+  background: #edf2fa;
+  color: #333;
+}
+
+.sp-tab--active {
+  background: #4878A8;
+  color: #fff;
+  font-weight: 600;
+}
+
+.sp-tab-hint {
+  font-size: 11.5px;
+  color: #888;
+  font-style: italic;
+  margin: -6px 0 14px;
 }
 
 /* Sub-chart containers for multi-chart sections */

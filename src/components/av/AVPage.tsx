@@ -27,11 +27,11 @@ const TOP_MENU_H = 65;
 
 /* ── helpers ─────────────────────────────────────────────── */
 function toOrderedItems(
-  data: SurveyRow[], variable: string, cats: string[], labelMap?: Record<string, string>
+  data: SurveyRow[], variable: string, cats: string[], labelMap?: Record<string, string>, preserveOrder = false
 ): BarItem[] {
   const dist = computeDistribution(data, variable);
   const total = dist.reduce((a, b) => a + b.count, 0);
-  return cats
+  const items = cats
     .map(cat => {
       const found = dist.find(d => d.label === cat);
       return {
@@ -41,8 +41,8 @@ function toOrderedItems(
         total,
       };
     })
-    .filter(it => it.count > 0)
-    .sort((a, b) => b.count - a.count);
+    .filter(it => it.count > 0);
+  return preserveOrder ? items : items.sort((a, b) => b.count - a.count);
 }
 
 function toBinaryItems(
@@ -130,13 +130,13 @@ const AVPage: React.FC = () => {
   // ── Pre-compute all chart data ───────────────────────────────
   const chartData = useMemo(() => {
     // E1: Familiarity
-    const familiarity: BarItem[] = toOrderedItems(filteredData, 'av_familiarity', AV_FAMILIARITY_CATS, AV_FAMILIARITY_SHORT);
+    const familiarity: BarItem[] = toOrderedItems(filteredData, 'av_familiarity', AV_FAMILIARITY_CATS, AV_FAMILIARITY_SHORT, true);
 
     // E5: Purchase Intentions
-    const timePurchase: BarItem[] = toOrderedItems(filteredData, 'av_timepurchase', AV_TIMEPURCHASE_CATS);
+    const timePurchase: BarItem[] = toOrderedItems(filteredData, 'av_timepurchase', AV_TIMEPURCHASE_CATS, undefined, true);
 
     // E6: Willingness to Pay
-    const willPay: BarItem[] = toOrderedItems(filteredData, 'av_willpay', AV_WILLPAY_CATS);
+    const willPay: BarItem[] = toOrderedItems(filteredData, 'av_willpay', AV_WILLPAY_CATS, undefined, true);
 
     // E2: General AV Attitudes (standard Likert)
     const avAtt: ChartVariable[] = AV_ATT_VARIABLES.map(v => ({
@@ -154,7 +154,7 @@ const AVPage: React.FC = () => {
     }));
 
     // E8: Vehicle Ownership Change
-    const ownChange: BarItem[] = toOrderedItems(filteredData, 'av_change_hhcarown', AV_CHANGE_OWN_CATS);
+    const ownChange: BarItem[] = toOrderedItems(filteredData, 'av_change_hhcarown', AV_CHANGE_OWN_CATS, undefined, true);
 
     // E9: Mode Choice Impact (3-pt change scale)
     const modeChange: GenericChartVariable[] = AV_MODECHANGE_VARIABLES.map(v => {
@@ -163,7 +163,7 @@ const AVPage: React.FC = () => {
     });
 
     // E3: Commute Time
-    const commute: BarItem[] = toOrderedItems(filteredData, 'av_addcomtime', AV_COMMUTE_CATS, AV_COMMUTE_SHORT);
+    const commute: BarItem[] = toOrderedItems(filteredData, 'av_addcomtime', AV_COMMUTE_CATS, AV_COMMUTE_SHORT, true);
 
     // E12: Multitasking (binary multi-select)
     // av_multi_interpass is only asked of respondents who would ride an AV;
