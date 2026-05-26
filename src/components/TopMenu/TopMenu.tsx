@@ -1,15 +1,18 @@
-import React, { useState } from 'react';
-import Select from 'react-select';
-import { useFilters, FilterField } from '../../context/FilterContext';
+import React, { useState, useEffect, useRef } from 'react';
+import { useFilters } from '../../context/FilterContext';
+import { loadSurveyData } from '../../utils/dataLoader';
 import './TopMenu.css';
 
-interface OptionType { value: string; label: string; isDisabled?: boolean; }
-interface GroupedOption { label: string; options: OptionType[]; }
+// ── Dimension definitions ─────────────────────────────────────
+// Values must match exactly what FilterContext's applyFilters expects.
 
-/* ── All filter options grouped by demographic category ───────── */
-const ALL_GROUPED_OPTIONS: GroupedOption[] = [
+interface DimOption { value: string; label: string; }
+interface Dimension { label: string; field: string; options: DimOption[]; }
+
+const DIMENSIONS: Dimension[] = [
   {
     label: 'Metro Area',
+    field: 'metro',
     options: [
       { value: 'ASU', label: 'Phoenix' },
       { value: 'GT',  label: 'Atlanta' },
@@ -19,6 +22,7 @@ const ALL_GROUPED_OPTIONS: GroupedOption[] = [
   },
   {
     label: 'Home State',
+    field: 'state',
     options: [
       { value: 'Arizona', label: 'Arizona' },
       { value: 'Florida', label: 'Florida' },
@@ -28,6 +32,7 @@ const ALL_GROUPED_OPTIONS: GroupedOption[] = [
   },
   {
     label: 'Gender',
+    field: 'gender',
     options: [
       { value: 'Female',               label: 'Female' },
       { value: 'Male',                 label: 'Male' },
@@ -37,6 +42,7 @@ const ALL_GROUPED_OPTIONS: GroupedOption[] = [
   },
   {
     label: 'Age Group',
+    field: 'age',
     options: [
       { value: '18-30 years', label: '18–30 years' },
       { value: '31-40 years', label: '31–40 years' },
@@ -48,6 +54,7 @@ const ALL_GROUPED_OPTIONS: GroupedOption[] = [
   },
   {
     label: 'Race',
+    field: 'race',
     options: [
       { value: 'White or Caucasian',        label: 'White or Caucasian' },
       { value: 'Black or African American', label: 'Black or African American' },
@@ -58,13 +65,15 @@ const ALL_GROUPED_OPTIONS: GroupedOption[] = [
   },
   {
     label: 'Ethnicity',
+    field: 'ethnicity',
     options: [
       { value: 'Yes', label: 'Hispanic or Latino' },
-      { value: 'No',  label: 'Non-Hispanic / Non-Latino' },
+      { value: 'No',  label: 'Non-Hispanic' },
     ],
   },
   {
     label: 'Place of Birth',
+    field: 'placebirth',
     options: [
       { value: 'United States or U.S. territory', label: 'US / US Territory' },
       { value: 'Other country',                   label: 'Outside the US' },
@@ -72,16 +81,18 @@ const ALL_GROUPED_OPTIONS: GroupedOption[] = [
   },
   {
     label: 'Education Level',
+    field: 'education',
     options: [
-      { value: 'Some grade/high school',                         label: 'Less than high school' },
-      { value: 'Completed high school or GED',                   label: 'High school / GED' },
-      { value: 'Some college or technical school',               label: 'Some college / Technical' },
-      { value: "Bachelor's degree(s) or some graduate school",   label: "Bachelor's degree" },
-      { value: 'Completed graduate degree(s)',                    label: 'Graduate degree' },
+      { value: 'Some grade/high school',                       label: 'Less than high school' },
+      { value: 'Completed high school or GED',                 label: 'High school / GED' },
+      { value: 'Some college or technical school',             label: 'Some college / Technical' },
+      { value: "Bachelor's degree(s) or some graduate school", label: "Bachelor's degree" },
+      { value: 'Completed graduate degree(s)',                  label: 'Graduate degree' },
     ],
   },
   {
     label: 'Employment',
+    field: 'employment',
     options: [
       { value: 'A worker (part-time or full-time)',  label: 'Worker' },
       { value: 'A student (part-time or full-time)', label: 'Student' },
@@ -91,17 +102,19 @@ const ALL_GROUPED_OPTIONS: GroupedOption[] = [
   },
   {
     label: 'Household Income',
+    field: 'income',
     options: [
       { value: 'Less than $25,000',    label: '< $25K' },
-      { value: '$25,000 to $49,999',   label: '$25K – $49K' },
-      { value: '$50,000 to $99,999',   label: '$50K – $99K' },
-      { value: '$100,000 to $149,999', label: '$100K – $149K' },
-      { value: '$150,000 to $249,999', label: '$150K – $249K' },
+      { value: '$25,000 to $49,999',   label: '$25K–$49K' },
+      { value: '$50,000 to $99,999',   label: '$50K–$99K' },
+      { value: '$100,000 to $149,999', label: '$100K–$149K' },
+      { value: '$150,000 to $249,999', label: '$150K–$249K' },
       { value: '$250,000 or more',     label: '$250K+' },
     ],
   },
   {
     label: 'Household Size',
+    field: 'hhsize',
     options: [
       { value: '1',  label: '1 person' },
       { value: '2',  label: '2 people' },
@@ -109,20 +122,22 @@ const ALL_GROUPED_OPTIONS: GroupedOption[] = [
       { value: '4',  label: '4 people' },
       { value: '5',  label: '5 people' },
       { value: '6',  label: '6 people' },
-      { value: '7+', label: '7 or more people' },
+      { value: '7+', label: '7 or more' },
     ],
   },
   {
     label: 'Housing Type',
+    field: 'housunit',
     options: [
-      { value: 'Stand-alone home',      label: 'Stand-alone home' },
-      { value: 'Condo/apartment',       label: 'Condo / Apartment' },
-      { value: 'Attached home/townhome',label: 'Attached / Townhome' },
-      { value: 'Mobile home',           label: 'Mobile home' },
+      { value: 'Stand-alone home',       label: 'Stand-alone home' },
+      { value: 'Condo/apartment',        label: 'Condo / Apartment' },
+      { value: 'Attached home/townhome', label: 'Attached / Townhome' },
+      { value: 'Mobile home',            label: 'Mobile home' },
     ],
   },
   {
     label: 'Home Ownership',
+    field: 'tenure',
     options: [
       { value: 'Own',  label: 'Own' },
       { value: 'Rent', label: 'Rent' },
@@ -131,187 +146,353 @@ const ALL_GROUPED_OPTIONS: GroupedOption[] = [
   },
 ];
 
-/* ── Map each option value → FilterContext field ──────────────── */
-const OPTION_TO_FIELD: Record<string, FilterField> = {
-  // Metro Area
-  ASU: 'metro', GT: 'metro', USF: 'metro', UT: 'metro',
-  // Home State
-  Arizona: 'state', Florida: 'state', Georgia: 'state', Texas: 'state',
-  // Gender
-  Female: 'gender', Male: 'gender', Other: 'gender', 'Prefer not to answer': 'gender',
-  // Age Group
-  '18-30 years': 'age', '31-40 years': 'age', '41-50 years': 'age',
-  '51-60 years': 'age', '61-70 years': 'age', '71+ years': 'age',
-  // Race
-  'White or Caucasian': 'race', 'Black or African American': 'race',
-  'Asian or Pacific Islander': 'race', 'Native American': 'race', 'Other race': 'race',
-  // Ethnicity
-  Yes: 'ethnicity', No: 'ethnicity',
-  // Place of Birth
-  'United States or U.S. territory': 'placebirth', 'Other country': 'placebirth',
-  // Education
-  'Some grade/high school': 'education',
-  'Completed high school or GED': 'education',
-  'Some college or technical school': 'education',
-  "Bachelor's degree(s) or some graduate school": 'education',
-  'Completed graduate degree(s)': 'education',
-  // Employment
-  'A worker (part-time or full-time)':  'employment',
-  'A student (part-time or full-time)': 'employment',
-  'Both a worker and a student':        'employment',
-  'Neither a worker nor a student':     'employment',
-  // Household Income
-  'Less than $25,000': 'income', '$25,000 to $49,999': 'income',
-  '$50,000 to $99,999': 'income', '$100,000 to $149,999': 'income',
-  '$150,000 to $249,999': 'income', '$250,000 or more': 'income',
-  // Household Size
-  '1': 'hhsize', '2': 'hhsize', '3': 'hhsize', '4': 'hhsize',
-  '5': 'hhsize', '6': 'hhsize', '7+': 'hhsize',
-  // Housing Type
-  'Stand-alone home': 'housunit', 'Condo/apartment': 'housunit',
-  'Attached home/townhome': 'housunit', 'Mobile home': 'housunit',
-  // Home Ownership
-  Own: 'tenure', Rent: 'tenure',
-  'Provided by somebody else (e.g., relative, employer)': 'tenure',
-};
-
-const customStyles = {
-  control: (base: any, state: any) => ({
-    ...base,
-    border: `1px solid ${state.isFocused ? '#80bdff' : '#ced4da'}`,
-    borderRadius: '0.25rem',
-    minHeight: '36px',
-    fontSize: '13.5px',
-    boxShadow: state.isFocused ? '0 0 0 0.2rem rgba(0,123,255,.25)' : 'none',
-    cursor: 'pointer',
-  }),
-  placeholder: (base: any) => ({ ...base, color: '#6c757d' }),
-  option: (base: any, state: any) => ({
-    ...base,
-    fontSize: '13.5px',
-    backgroundColor: state.isSelected ? '#007bff' : state.isDisabled ? '#f8f9fa' : state.isFocused ? '#e8f0fe' : 'white',
-    color: state.isSelected ? 'white' : state.isDisabled ? '#aaa' : '#333',
-    cursor: state.isDisabled ? 'not-allowed' : 'pointer',
-  }),
-  group: (base: any) => ({ ...base, padding: 0 }),
-  groupHeading: (base: any) => ({
-    ...base,
-    fontSize: '11px',
-    fontWeight: 700,
-    color: '#6c757d',
-    textTransform: 'uppercase' as const,
-    backgroundColor: '#f8f9fa',
-    paddingTop: '6px',
-    paddingBottom: '6px',
-    marginBottom: '4px',
-  }),
-  menuPortal: (base: any) => ({ ...base, zIndex: 9999 }),
-};
+// ── Component ─────────────────────────────────────────────────
 
 const TopMenu: React.FC = () => {
-  const { addFilter, removeFilter, clearFilters } = useFilters();
-  const [dropdownValues, setDropdownValues] = useState<(OptionType | null)[]>([null, null, null]);
-  const [isAllSelected, setIsAllSelected] = useState(true);
+  const { filters, addFilter, removeFilter, clearFilters, applyFilters } = useFilters();
 
-  const hasSelection = dropdownValues.some(v => v !== null);
+  // dimSelections: field → selected values.
+  // A field ABSENT from this map means "all selected" (no filter active).
+  // A field present with empty array means 0 selected (sentinel → 0 results).
+  const [dimSelections, setDimSelections] = useState<Record<string, string[]>>({});
 
-  /* Build options for a given slot — disable entire group if that field is
-     already selected in another slot, or if exact value is already selected. */
-  const getOptionsForSlot = (slotIndex: number): GroupedOption[] => {
-    const usedFields = new Set<FilterField>();
-    const usedValues = new Set<string>();
-    dropdownValues.forEach((v, i) => {
-      if (i !== slotIndex && v) {
-        usedFields.add(OPTION_TO_FIELD[v.value]);
-        usedValues.add(v.value);
-      }
-    });
-    return ALL_GROUPED_OPTIONS.map(group => {
-      const field = OPTION_TO_FIELD[group.options[0].value];
-      const groupUsed = usedFields.has(field);
-      return {
-        label: group.label,
-        options: group.options.map(opt => ({
-          ...opt,
-          isDisabled: groupUsed || usedValues.has(opt.value),
-        })),
-      };
-    });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const [totalCount, setTotalCount] = useState<number | null>(null);
+  const [filteredCount, setFilteredCount] = useState<number | null>(null);
+
+  const menuRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // ── Derived values ────────────────────────────────────────────
+
+  const isAllDefault = Object.keys(dimSelections).length === 0;
+  const activeDimCount = Object.keys(dimSelections).length;
+
+  const getSelectedValues = (dim: Dimension): string[] =>
+    dimSelections[dim.field] ?? dim.options.map(o => o.value);
+
+  const isDimDefault = (dim: Dimension): boolean =>
+    dimSelections[dim.field] === undefined;
+
+  const isChecked = (dim: Dimension, value: string): boolean => {
+    const sel = dimSelections[dim.field];
+    if (sel === undefined) return true;
+    return sel.includes(value);
   };
 
-  const handleAllChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.checked) {
-      setDropdownValues([null, null, null]);
-      setIsAllSelected(true);
-      clearFilters();
+  // ── Filter sync ───────────────────────────────────────────────
+  // Clears all values for the field, then re-adds selected ones.
+
+  const syncDimToFilter = (field: string, newSelected: string[], totalOpts: number) => {
+    removeFilter(field as any);
+    if (newSelected.length === totalOpts) return; // all selected = no filter needed
+    if (newSelected.length === 0) {
+      addFilter({ field: field as any, value: '__no_match__' });
+      return;
     }
+    newSelected.forEach(val => addFilter({ field: field as any, value: val }));
   };
 
-  const handleDropdownChange = (index: number, selected: OptionType | null) => {
-    const newValues = [...dropdownValues];
-    const old = newValues[index];
-    if (old) removeFilter(OPTION_TO_FIELD[old.value], old.value);
+  // ── Event handlers ────────────────────────────────────────────
 
-    newValues[index] = selected;
-    setDropdownValues(newValues);
+  const handleCheckboxChange = (dim: Dimension, value: string, checked: boolean) => {
+    const current = getSelectedValues(dim);
+    const newSelected = checked
+      ? [...current, value]
+      : current.filter(v => v !== value);
 
-    if (selected) {
-      setIsAllSelected(false);
-      addFilter({ field: OPTION_TO_FIELD[selected.value], value: selected.value });
-    } else if (!newValues.some(v => v !== null)) {
-      setIsAllSelected(true);
-      clearFilters();
+    if (newSelected.length === dim.options.length) {
+      setDimSelections(prev => {
+        const { [dim.field]: _removed, ...rest } = prev;
+        return rest;
+      });
+    } else {
+      setDimSelections(prev => ({ ...prev, [dim.field]: newSelected }));
     }
+    syncDimToFilter(dim.field, newSelected, dim.options.length);
   };
 
-  const handleReset = () => {
-    setDropdownValues([null, null, null]);
-    setIsAllSelected(true);
+  const handleDimAll = (dim: Dimension) => {
+    setDimSelections(prev => {
+      const { [dim.field]: _removed, ...rest } = prev;
+      return rest;
+    });
+    removeFilter(dim.field as any);
+  };
+
+  const handleDimNone = (dim: Dimension) => {
+    setDimSelections(prev => ({ ...prev, [dim.field]: [] }));
+    removeFilter(dim.field as any);
+    addFilter({ field: dim.field as any, value: '__no_match__' });
+  };
+
+  const handleResetAll = () => {
+    setDimSelections({});
     clearFilters();
   };
 
+  const handleChipRemove = (dim: Dimension) => {
+    setDimSelections(prev => {
+      const { [dim.field]: _removed, ...rest } = prev;
+      return rest;
+    });
+    removeFilter(dim.field as any);
+  };
+
+  const handleAllCheckboxChange = () => {
+    if (!isAllDefault) handleResetAll();
+  };
+
+  // ── Modal ──────────────────────────────────────────────────────
+
+  const openModal = () => {
+    setIsModalOpen(true);
+    setSearchQuery('');
+    setTimeout(() => searchInputRef.current?.focus(), 50);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSearchQuery('');
+  };
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isModalOpen) closeModal();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [isModalOpen]);
+
+  // Adjust the CSS custom property so main content offsets correctly when chips wrap
+  useEffect(() => {
+    if (!menuRef.current) return;
+    const update = () => {
+      const h = menuRef.current?.offsetHeight ?? 65;
+      document.documentElement.style.setProperty('--top-menu-height', `${h}px`);
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(menuRef.current);
+    return () => ro.disconnect();
+  }, []);
+
+  // Live respondent count (loadSurveyData is module-level cached — no extra network request)
+  useEffect(() => {
+    loadSurveyData().then(data => {
+      setTotalCount(data.length);
+      setFilteredCount(applyFilters(data).length);
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters]);
+
+  // ── Search ────────────────────────────────────────────────────
+
+  const getFilteredDimensions = (): Dimension[] => {
+    if (!searchQuery.trim()) return DIMENSIONS;
+    const q = searchQuery.toLowerCase();
+    return DIMENSIONS.flatMap(dim => {
+      if (dim.label.toLowerCase().includes(q)) return [dim];
+      const matched = dim.options.filter(o => o.label.toLowerCase().includes(q));
+      if (matched.length > 0) return [{ ...dim, options: matched }];
+      return [];
+    });
+  };
+
+  // ── Chip helpers ──────────────────────────────────────────────
+
+  const activeChips = DIMENSIONS.filter(d => dimSelections[d.field] !== undefined);
+
+  const getChipLabel = (dim: Dimension): string => {
+    const sel = dimSelections[dim.field];
+    if (!sel || sel.length === 0) return `${dim.label}: none selected`;
+    return `${dim.label}: ${sel.length} of ${dim.options.length} selected`;
+  };
+
+  const isChipWarning = (dim: Dimension): boolean => {
+    const sel = dimSelections[dim.field];
+    return sel !== undefined && sel.length === 0;
+  };
+
+  // ── Render helpers ────────────────────────────────────────────
+
+  const filteredDimensions = getFilteredDimensions();
+
+  const respondentLabel = (() => {
+    if (filteredCount === null) return 'Loading…';
+    if (isAllDefault) return `Showing ${filteredCount.toLocaleString()} respondents`;
+    return `Filtered: ${filteredCount.toLocaleString()} of ${totalCount?.toLocaleString() ?? '…'} respondents`;
+  })();
+
+  // ── JSX ───────────────────────────────────────────────────────
+
   return (
-    <div className="menu-container">
-      <span className="segment-label">Select Segment:</span>
+    <>
+      {/* ── Top bar ── */}
+      <div className="menu-container" ref={menuRef}>
+        <div className="filter-bar">
+          <label className="segment-label">Select Segment:</label>
 
-      <div className="all-checkbox">
-        <input
-          type="checkbox"
-          checked={isAllSelected}
-          onChange={handleAllChange}
-          disabled={hasSelection}
-        />
-        <span>All</span>
-      </div>
-
-      <div className="filter-dropdowns">
-        {[0, 1, 2].map(i => (
-          <div key={i} className="filter-select-wrapper">
-            <Select
-              className="filter-select"
-              value={dropdownValues[i]}
-              onChange={opt => handleDropdownChange(i, opt)}
-              options={getOptionsForSlot(i)}
-              placeholder="Select attribute"
-              styles={customStyles}
-              isClearable
-              isSearchable
-              menuPortalTarget={document.body}
-              menuPosition="fixed"
-              maxMenuHeight={240}
+          <div className="all-select-checkbox">
+            <input
+              type="checkbox"
+              checked={isAllDefault}
+              onChange={handleAllCheckboxChange}
+              aria-label="All respondents (no segment filter)"
             />
+            <span className="all-select-label">All</span>
           </div>
-        ))}
+
+          <button
+            className="filter-trigger-btn"
+            onClick={openModal}
+            aria-haspopup="dialog"
+            aria-expanded={isModalOpen}
+            title="Open filter palette"
+          >
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+              <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
+            </svg>
+            <span>Filter segments…</span>
+            {activeDimCount > 0 && (
+              <span className="active-badge" aria-label={`${activeDimCount} filter dimensions active`}>
+                {activeDimCount}
+              </span>
+            )}
+            <span className="cmd-hint" aria-hidden="true">ESC to close</span>
+          </button>
+
+          {activeChips.length > 0 && (
+            <div className="chip-strip" aria-label="Active filters">
+              {activeChips.map(dim => (
+                <span
+                  key={dim.field}
+                  className={`filter-chip${isChipWarning(dim) ? ' filter-chip--warning' : ''}`}
+                  role="status"
+                  aria-label={getChipLabel(dim)}
+                >
+                  <span className="chip-label">{getChipLabel(dim)}</span>
+                  <button
+                    className="chip-remove"
+                    onClick={() => handleChipRemove(dim)}
+                    aria-label={`Reset ${dim.label} to all selected`}
+                    title={`Reset ${dim.label}`}
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+
+          <div className="button-container">
+            <button
+              className="reset-button"
+              onClick={handleResetAll}
+              disabled={isAllDefault}
+            >
+              Reset
+            </button>
+          </div>
+        </div>
       </div>
 
-      <button
-        className="reset-btn"
-        onClick={handleReset}
-        disabled={isAllSelected && !hasSelection}
-      >
-        Reset
-      </button>
-    </div>
+      {/* ── Modal ── */}
+      {isModalOpen && (
+        <div
+          className="filter-modal-backdrop"
+          onClick={e => { if (e.target === e.currentTarget) closeModal(); }}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Filter segments"
+        >
+          <div className="filter-modal-card">
+
+            <div className="modal-search-row">
+              <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" className="modal-search-icon">
+                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
+              </svg>
+              <input
+                ref={searchInputRef}
+                type="text"
+                className="modal-search-input"
+                placeholder="Search dimensions or options…"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                aria-label="Search filter dimensions and options"
+              />
+              <button className="modal-esc-btn" onClick={closeModal} aria-label="Close filter modal">
+                ESC
+              </button>
+            </div>
+
+            <div className="modal-grid-scroll">
+              {filteredDimensions.length === 0 ? (
+                <p className="modal-empty-state">
+                  No dimensions or options match &ldquo;{searchQuery}&rdquo;
+                </p>
+              ) : (
+                <div className="modal-grid">
+                  {filteredDimensions.map(dim => {
+                    const fullDim = DIMENSIONS.find(d => d.field === dim.field)!;
+                    const isPartial = !isDimDefault(fullDim);
+                    return (
+                      <div
+                        key={dim.field}
+                        className={`dim-column${isPartial ? ' dim-column--active' : ''}`}
+                      >
+                        <div className="dim-header">
+                          <span className="dim-label">{dim.label}</span>
+                          <div className="dim-actions">
+                            <button
+                              className="dim-action-link"
+                              onClick={() => handleDimAll(fullDim)}
+                              title={`Select all ${dim.label}`}
+                            >
+                              All
+                            </button>
+                            <button
+                              className="dim-action-link"
+                              onClick={() => handleDimNone(fullDim)}
+                              title={`Deselect all ${dim.label}`}
+                            >
+                              None
+                            </button>
+                          </div>
+                        </div>
+                        <div className="dim-options">
+                          {dim.options.map(opt => (
+                            <label key={opt.value} className="dim-option">
+                              <input
+                                type="checkbox"
+                                checked={isChecked(fullDim, opt.value)}
+                                onChange={e => handleCheckboxChange(fullDim, opt.value, e.target.checked)}
+                              />
+                              <span>{opt.label}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            <div className="modal-footer">
+              <span className="modal-respondent-count">{respondentLabel}</span>
+              <div className="modal-footer-actions">
+                <button className="modal-reset-btn" onClick={handleResetAll}>Reset all</button>
+                <button className="modal-done-btn" onClick={closeModal}>Done ✓</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

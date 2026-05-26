@@ -57,7 +57,7 @@ const SKIP = new Set(['Seen but not answered', 'Missing (other)', 'Appropriate s
 interface FilterCtx {
   filters: ActiveFilter[];
   addFilter:    (f: ActiveFilter) => void;
-  removeFilter: (field: FilterField, value: string) => void;
+  removeFilter: (field: FilterField) => void;
   clearFilters: () => void;
   applyFilters: (data: SurveyRow[]) => SurveyRow[];
 }
@@ -67,79 +67,98 @@ const FilterContext = createContext<FilterCtx>({} as FilterCtx);
 export const FilterProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [filters, setFilters] = useState<ActiveFilter[]>([]);
 
+  // Accumulate filters — multiple values per field are allowed (OR within field, AND across fields)
   const addFilter = (f: ActiveFilter) =>
-    setFilters(prev => [...prev.filter(x => x.field !== f.field), f]);
+    setFilters(prev => [...prev, f]);
 
-  const removeFilter = (field: FilterField, value: string) =>
-    setFilters(prev => prev.filter(x => !(x.field === field && x.value === value)));
+  // Clear all filters for a given field
+  const removeFilter = (field: FilterField) =>
+    setFilters(prev => prev.filter(x => x.field !== field));
 
   const clearFilters = () => setFilters([]);
 
   const applyFilters = (data: SurveyRow[]): SurveyRow[] => {
     if (!filters.length) return data;
+
+    // Group filter values by field
+    const byField: Record<string, string[]> = {};
+    for (const f of filters) {
+      if (!byField[f.field]) byField[f.field] = [];
+      byField[f.field].push(f.value);
+    }
+
     return data.filter(row => {
-      for (const f of filters) {
-        // ── Existing filters ──────────────────────────────────
-        if (f.field === 'metro'      && row['SurveyInstitution'] !== f.value) return false;
-        if (f.field === 'gender'     && row['gender'] !== MISSING && row['gender'] !== f.value) return false;
-        if (f.field === 'age'        && row['AgeGroup1'] !== MISSING && row['AgeGroup1'] !== f.value) return false;
-        if (f.field === 'employment' && row['employment'] !== MISSING && row['employment'] !== f.value) return false;
-        if (f.field === 'income'     && row['IncomeImputation'] !== MISSING && row['IncomeImputation'] !== f.value) return false;
+      for (const [field, values] of Object.entries(byField)) {
+        // Sentinel value used when a dimension has 0 options selected → no rows match
+        if (values.includes('__no_match__')) return false;
 
-        // ── Race (binary multi-select columns) ────────────────
-        if (f.field === 'race') {
-          const col = RACE_COL[f.value];
-          if (!col || row[col] !== f.value) return false;
-        }
+        let passes = false;
 
-        // ── Ethnicity ─────────────────────────────────────────
-        if (f.field === 'ethnicity') {
-          const v = row['hispaniclatin'];
-          if (!v || SKIP.has(v) || v !== f.value) return false;
-        }
+        if (field === 'metro') {
+          passes = values.includes(row['SurveyInstitution'] as string);
 
-        // ── Education ─────────────────────────────────────────
-        if (f.field === 'education') {
-          const v = row['education'];
-          if (!v || SKIP.has(v) || v !== f.value) return false;
-        }
+        } else if (field === 'gender') {
+          // Rows with unknown gender pass through
+          passes = row['gender'] === MISSING || values.includes(row['gender'] as string);
 
-        // ── Place of birth ────────────────────────────────────
-        if (f.field === 'placebirth') {
-          const v = row['placebirth'];
-          if (!v || SKIP.has(v) || v !== f.value) return false;
-        }
+        } else if (field === 'age') {
+          passes = row['AgeGroup1'] === MISSING || values.includes(row['AgeGroup1'] as string);
 
-        // ── Home ownership / tenure ───────────────────────────
-        if (f.field === 'tenure') {
-          const v = row['tenure'];
-          if (!v || SKIP.has(v) || v !== f.value) return false;
-        }
+        } else if (field === 'employment') {
+          passes = row['employment'] === MISSING || values.includes(row['employment'] as string);
 
-        // ── Housing type ──────────────────────────────────────
-        if (f.field === 'housunit') {
-          const v = row['housunit'];
-          if (!v || SKIP.has(v) || v !== f.value) return false;
-        }
+        } else if (field === 'income') {
+          passes = row['IncomeImputation'] === MISSING || values.includes(row['IncomeImputation'] as string);
 
-        // ── Household size ────────────────────────────────────
-        if (f.field === 'hhsize') {
-          const v = row['hh_size'];
-          if (!v || SKIP.has(v)) return false;
-          if (f.value === '7+') {
-            const n = parseInt(v);
-            const passes = v === '10 or more' || (!isNaN(n) && n >= 7);
-            if (!passes) return false;
+        } else if (field === 'race') {
+          // A respondent may have multiple races; match if any selected race column matches
+          passes = values.some(v => {
+            const col = RACE_COL[v];
+            return !!col && row[col] === v;
+          });
+
+        } else if (field === 'ethnicity') {
+          const v = row['hispaniclatin'] as string;
+          passes = !!v && !SKIP.has(v) && values.includes(v);
+
+        } else if (field === 'education') {
+          const v = row['education'] as string;
+          passes = !!v && !SKIP.has(v) && values.includes(v);
+
+        } else if (field === 'placebirth') {
+          const v = row['placebirth'] as string;
+          passes = !!v && !SKIP.has(v) && values.includes(v);
+
+        } else if (field === 'tenure') {
+          const v = row['tenure'] as string;
+          passes = !!v && !SKIP.has(v) && values.includes(v);
+
+        } else if (field === 'housunit') {
+          const v = row['housunit'] as string;
+          passes = !!v && !SKIP.has(v) && values.includes(v);
+
+        } else if (field === 'hhsize') {
+          const v = row['hh_size'] as string;
+          if (!v || SKIP.has(v)) {
+            passes = false;
           } else {
-            if (v !== f.value) return false;
+            passes = values.some(sel => {
+              if (sel === '7+') {
+                const n = parseInt(v);
+                return v === '10 or more' || (!isNaN(n) && n >= 7);
+              }
+              return v === sel;
+            });
           }
+
+        } else if (field === 'state') {
+          passes = values.some(v => {
+            const fips = STATE_FIPS[v];
+            return !!fips && row['HState2'] === fips;
+          });
         }
 
-        // ── Home state ────────────────────────────────────────
-        if (f.field === 'state') {
-          const fips = STATE_FIPS[f.value];
-          if (!fips || row['HState2'] !== fips) return false;
-        }
+        if (!passes) return false;
       }
       return true;
     });
